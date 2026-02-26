@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -303,14 +304,14 @@ export default function AnalyticsDashboard() {
           
           <div className='p-10 bg-zinc-950 flex flex-col items-center'>
             <div id="eod-report-preview-content" className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] w-[300px] font-black">
-              <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+              <div className="text-center border-b border-dashed border-black pb-4 mb-4">
                 <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Dindigul Ananda\'s Briyani'}</h1>
                 <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
                 <p className="text-base font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
                 <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
 
-              <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4">
+              <div className="space-y-3 border-b border-dashed border-black pb-4 mb-4">
                 <div className="flex justify-between font-black">
                   <span>TOTAL BILLS</span>
                   <span>{allOrders.length}</span>
@@ -345,7 +346,7 @@ export default function AnalyticsDashboard() {
                 </div>
               </div>
 
-              <div className="text-center pt-6 border-t-2 border-dashed border-black opacity-80">
+              <div className="text-center pt-6 border-t border-dashed border-black opacity-80">
                 <p className="italic text-[9px] uppercase">Audit Report • {new Date().toLocaleTimeString()}</p>
               </div>
             </div>
@@ -361,16 +362,16 @@ export default function AnalyticsDashboard() {
       
       <div id="printable-eod-report" className="hidden">
           <div className="font-mono text-black p-0 m-0 w-[80mm] text-xs">
-            <div className="text-center border-b-2 border-dashed border-black pb-2 mb-2">
+            <div className="text-center border-b border-dashed border-black pb-2 mb-2">
               <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Dindigul Ananda's Briyani"}</h1>
               <p className="uppercase text-[9px] font-bold mb-1">{printSettings?.address}</p>
-              <div className="text-sm font-black border-y-2 border-black py-1 my-1 uppercase">
+              <div className="text-sm font-black border-y border-black py-1 my-1 uppercase">
                 End of Day Report
               </div>
               <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
             </div>
 
-            <div className="space-y-1 border-b-2 border-dashed border-black pb-2 mb-2">
+            <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2">
               <div className="flex justify-between">
                 <span>TOTAL BILLS</span>
                 <span className="font-black">{allOrders.length}</span>
@@ -405,7 +406,7 @@ export default function AnalyticsDashboard() {
               </div>
             </div>
 
-            <div className="text-center pt-2 border-t-2 border-dashed border-black">
+            <div className="text-center pt-2 border-t border-dashed border-black">
               <p className="italic text-[9px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
               <p className="text-[8px] mt-1 font-black uppercase tracking-widest">Dindigul Ananda's System</p>
             </div>

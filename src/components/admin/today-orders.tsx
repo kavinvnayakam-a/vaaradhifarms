@@ -325,14 +325,13 @@ const formatDate = (ts: any) => {
 
 const ReceiptComponent = ({ order, settings, tableNumber }: { order: Order, settings: PrintSettings, tableNumber: string | null }) => (
     <div className="bg-white text-black p-1 shadow-2xl font-mono text-[11px] w-[80mm]">
-      <div className="text-center mb-4">
-          <h2 className="text-xl font-black uppercase">{settings.storeName}</h2>
-          <p className="text-[9px] uppercase font-bold leading-tight">{settings.address}</p>
+      <div className="text-center mb-2">
+          <h2 className="text-lg font-black uppercase">{settings.storeName}</h2>
+          <p className="text-[9px] uppercase font-bold leading-tight px-4">{settings.address}</p>
           <p className="text-[9px] font-bold">PH: {settings.phone}</p>
           <p className="text-[9px] font-bold">GSTIN: {settings.gstin}</p>
       </div>
-
-      <div className="border-y-2 border-dashed border-black py-1 my-2 text-[10px]">
+      <div className="border-y border-dashed border-black py-1 my-2 text-[10px]">
           <div className="flex justify-between">
               <span>Date: {formatDate(order.timestamp)}</span>
               <span>Time: {formatTime(order.timestamp)}</span>
@@ -348,28 +347,28 @@ const ReceiptComponent = ({ order, settings, tableNumber }: { order: Order, sett
               <span className="uppercase">Cust: {order.customerName}</span>
           </div>
       </div>
-
-      <div className="mb-2">
-          <div className="grid grid-cols-12 font-black border-b-2 border-dashed border-black pb-1 mb-1 text-[9px]">
-              <span className="col-span-6">Item</span>
-              <span className="col-span-2 text-center">Qty</span>
-              <span className="col-span-2 text-right">Rate</span>
-              <span className="col-span-2 text-right">Amt</span>
-          </div>
-          {order?.items.map((item, idx) => (
-              <div key={idx} className="grid grid-cols-12 text-[9px] leading-tight font-bold py-1">
-                  <span className="col-span-6 uppercase truncate pr-1">{item.name}</span>
-                  <span className="col-span-2 text-center">{item.quantity}</span>
-                  <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
-                  <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
-              </div>
-          ))}
-      </div>
-
-      <div className="border-t-2 border-dashed border-black pt-2 space-y-1 text-right text-[10px] font-bold">
-          <div className="flex justify-between"><span>Sub Total</span> <span>{formatCurrency(order?.subtotal || 0, 2)}</span></div>
-          <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{formatCurrency(order?.cgst || 0, 2)}</span></div>
-          <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{formatCurrency(order?.sgst || 0, 2)}</span></div>
+      <table className="w-full text-[10px]">
+          <thead>
+              <tr className="border-b border-dashed border-black">
+                  <th className="text-left font-bold uppercase pb-1">Item</th>
+                  <th className="text-center font-bold uppercase pb-1">Qty</th>
+                  <th className="text-right font-bold uppercase pb-1">Price</th>
+              </tr>
+          </thead>
+          <tbody>
+              {order?.items.map((item, idx) => (
+                  <tr key={idx} className="font-bold">
+                      <td className="py-1 uppercase">{item.name}</td>
+                      <td className="text-center py-1">{item.quantity}</td>
+                      <td className="text-right py-1">{(item.price * item.quantity).toFixed(2)}</td>
+                  </tr>
+              ))}
+          </tbody>
+      </table>
+      <div className="border-t border-dashed border-black pt-2 mt-2 space-y-1 text-right text-[10px] font-bold">
+          <div className="flex justify-between"><span>Sub Total</span> <span>{(order?.subtotal || 0).toFixed(2)}</span></div>
+          <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{(order?.cgst || 0).toFixed(2)}</span></div>
+          <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{(order?.sgst || 0).toFixed(2)}</span></div>
           {(order?.roundOff || 0) !== 0 && (
               <div className="flex justify-between"><span>Round off</span> <span>{order?.roundOff?.toFixed(2)}</span></div>
           )}
@@ -378,14 +377,13 @@ const ReceiptComponent = ({ order, settings, tableNumber }: { order: Order, sett
               <span>{formatCurrency(order?.totalPrice || 0)}</span>
           </div>
           {order?.paymentMethod === 'Cash' && order.cashReceived != null && (
-              <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
+              <div className="pt-2 mt-2 border-t border-dashed border-black/40 text-xs">
                 <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(order.cashReceived)}</span></div>
                 <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(order.changeDue || 0)}</span></div>
               </div>
           )}
       </div>
-
-      <div className="text-center mt-4 border-t-2 border-dashed border-black pt-2">
+      <div className="text-center mt-4 border-t border-dashed border-black pt-2">
           <p className="text-[9px] font-bold uppercase italic">{settings.footerMessage}</p>
       </div>
   </div>
@@ -402,7 +400,7 @@ const KOTComponent = ({ order, tableNumber }: { order: Order, tableNumber: strin
                 {tableNumber ? '(Dine-In)' : `(${order.customerName})`}
             </p>
         </div>
-        <div className="border-y-2 border-dashed border-black my-4 py-2 text-left">
+        <div className="border-y border-dashed border-black my-4 py-2 text-left">
             {order.items.map((item, idx) => (
                 <p key={idx} className="text-lg font-black uppercase">
                     {item.quantity}x {item.name}
@@ -417,7 +415,7 @@ const CollectionTokenComponent = ({ order }: { order: Order }) => (
     <div className="bg-white text-black p-4 font-mono w-[80mm] text-center">
         <p className="text-lg font-black uppercase tracking-widest">Collection Token</p>
         <h1 className="text-8xl font-black italic leading-none my-4">#{order.orderNumber}</h1>
-        <div className="border-y-2 border-dashed border-black py-2 my-2 text-left">
+        <div className="border-y border-dashed border-black py-2 my-2 text-left">
             <p className="text-xl font-black uppercase mb-1">{order.customerName}</p>
             {order.items.map((item, idx) => (
                 <p key={idx} className="text-base font-black uppercase">
