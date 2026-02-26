@@ -26,7 +26,7 @@ export interface PrintSettings {
   paperWidth: '58mm' | '80mm';
   triggerCashDrawer: boolean;
   optimizedFor: string;
-  templateId: 'template-1' | 'template-2' | 'template-3' | 'template-4' | 'template-5';
+  templateId: 'template-1' | 'template-2' | 'template-3' | 'template-4' | 'template-5' | 'template-6' | 'template-7' | 'template-8' | 'template-9' | 'template-10';
 }
 
 interface ReceiptProps {
@@ -226,6 +226,170 @@ const Template5 = ({ order, settings, tableNumber }: ReceiptProps) => (
     </div>
 );
 
+// Template 6: Dot Matrix
+const Template6 = ({ order, settings, tableNumber }: ReceiptProps) => (
+    <div className="bg-white text-black p-2 font-mono w-[80mm] text-[10px]">
+        <div className="text-center mb-2">
+            <p className="font-bold tracking-widest uppercase">{settings.storeName}</p>
+            <p className="text-[9px]">{settings.address}</p>
+            <p className="text-[9px]">GST: {settings.gstin}</p>
+        </div>
+        <p className="border-t border-dashed border-black"></p>
+        <div className="flex justify-between text-[9px]"><p>#{order.orderNumber}</p><p>{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p></div>
+        <div className="flex justify-between text-[9px]"><p>{order.customerName}</p><p>{tableNumber ? `Table: ${tableNumber}` : 'Takeaway'}</p></div>
+        <p className="border-t border-dashed border-black"></p>
+        <table className="w-full text-[10px]">
+            <thead>
+                <tr>
+                    <th className="text-left">ITEM</th>
+                    <th className="text-center">QTY</th>
+                    <th className="text-right">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+            {order.items.map((item, idx) => (
+                <tr key={idx}>
+                    <td>{item.name}</td>
+                    <td className="text-center">{item.quantity}</td>
+                    <td className="text-right">{(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+            ))}
+            </tbody>
+        </table>
+        <p className="border-t border-dashed border-black"></p>
+        <div className="text-right mt-1">
+            <p>SUBTOTAL: {(order.subtotal || 0).toFixed(2)}</p>
+            <p>GST: {((order.cgst || 0) + (order.sgst || 0)).toFixed(2)}</p>
+            <p className="font-bold text-lg">TOTAL: {formatCurrency(order.totalPrice)}</p>
+        </div>
+        <p className="border-t border-dashed border-black"></p>
+        <p className="text-center text-[9px] mt-2">{settings.footerMessage}</p>
+    </div>
+);
+
+// Template 7: Elegant Serif
+const Template7 = ({ order, settings, tableNumber }: ReceiptProps) => (
+    <div className="bg-white text-black p-4 font-serif w-[80mm] text-[12px]">
+        <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold">{settings.storeName}</h2>
+            <p className="text-[10px]">{settings.address}</p>
+            <p className="text-[10px]">Tel: {settings.phone}</p>
+        </div>
+        <div className="text-[10px] border-t border-b border-black py-1 my-2">
+            <p>Order: #{order.orderNumber} for {order.customerName}</p>
+            <p>{formatDate(order.timestamp)} - {formatTime(order.timestamp)} | {tableNumber ? `Table ${tableNumber}` : 'Takeaway'}</p>
+        </div>
+        <div className="my-4">
+            {order.items.map((item, idx) => (
+                <div key={idx} className="flex justify-between my-2">
+                    <p>{item.quantity} x {item.name}</p>
+                    <p>{(item.price * item.quantity).toFixed(2)}</p>
+                </div>
+            ))}
+        </div>
+        <div className="border-t border-black pt-2 text-right">
+            <p>Subtotal: {(order.subtotal || 0).toFixed(2)}</p>
+            <p>Taxes: {((order.cgst || 0) + (order.sgst || 0)).toFixed(2)}</p>
+            <p className="font-bold text-xl mt-2">Total: {formatCurrency(order.totalPrice)}</p>
+        </div>
+        <div className="text-center text-[10px] italic mt-4">{settings.footerMessage}</div>
+    </div>
+);
+
+// Template 8: Bold Block
+const Template8 = ({ order, settings, tableNumber }: ReceiptProps) => (
+    <div className="bg-white text-black font-sans w-[80mm] text-[11px]">
+        <div className="bg-black text-white text-center p-2">
+            <h2 className="text-xl font-black uppercase tracking-wider">{settings.storeName}</h2>
+        </div>
+        <div className="p-2">
+            <div className="text-center text-[9px] mb-2">
+                <p>{settings.address}</p>
+                <p>GST: {settings.gstin}</p>
+            </div>
+            <div className="flex justify-between text-[10px] p-2 bg-gray-100 rounded-md">
+                <p>Order: <span className="font-bold">#{order.orderNumber}</span></p>
+                <p>{formatDate(order.timestamp)}</p>
+            </div>
+            <table className="w-full my-2">
+                <thead className="border-b-2 border-black"><tr><th className="text-left">Item</th><th className="text-right">Total</th></tr></thead>
+                <tbody>
+                    {order.items.map((item, idx) => (
+                        <tr key={idx}><td className="py-1">{item.quantity}x {item.name}</td><td className="text-right">{(item.price * item.quantity).toFixed(2)}</td></tr>
+                    ))}
+                </tbody>
+            </table>
+            <div className="text-right border-t-2 border-black pt-1">
+                <p>Sub: {(order.subtotal || 0).toFixed(2)}</p>
+                <p>GST: {((order.cgst || 0) + (order.sgst || 0)).toFixed(2)}</p>
+                <p className="text-lg font-black">Total: {formatCurrency(order.totalPrice)}</p>
+            </div>
+        </div>
+        <div className="bg-black text-white text-center p-2 text-[9px] font-bold mt-2">
+            {settings.footerMessage}
+        </div>
+    </div>
+);
+
+// Template 9: Two Column
+const Template9 = ({ order, settings, tableNumber }: ReceiptProps) => (
+    <div className="bg-white text-black p-3 font-sans w-[80mm] text-[11px]">
+        <div className="grid grid-cols-2 gap-4 mb-2">
+            <div>
+                <h2 className="text-lg font-extrabold uppercase">{settings.storeName}</h2>
+                <p className="text-[9px]">{settings.address}</p>
+            </div>
+            <div className="text-right text-[10px]">
+                <p>Order: <span className="font-bold">#{order.orderNumber}</span></p>
+                <p>Date: {formatDate(order.timestamp)}</p>
+                <p>Mode: {tableNumber ? `Table ${tableNumber}` : 'Takeaway'}</p>
+            </div>
+        </div>
+        <div className="border-y border-dashed border-black py-2">
+            <div className="grid grid-cols-5 font-bold text-[10px]">
+                <div className="col-span-3">Item</div>
+                <div className="text-center">Qty</div>
+                <div className="text-right">Price</div>
+            </div>
+            {order.items.map((item, idx) => (
+                <div key={idx} className="grid grid-cols-5 text-[10px] mt-1">
+                    <div className="col-span-3">{item.name}</div>
+                    <div className="text-center">{item.quantity}</div>
+                    <div className="text-right">{(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+            ))}
+        </div>
+        <div className="flex justify-end mt-2">
+            <div className="w-1/2 text-right text-xs">
+                <div className="flex justify-between"><span>Subtotal:</span><span>{(order.subtotal || 0).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>GST:</span><span>{((order.cgst || 0) + (order.sgst || 0)).toFixed(2)}</span></div>
+                <div className="flex justify-between font-extrabold text-base mt-1 pt-1 border-t border-black"><span>Total:</span><span>{formatCurrency(order.totalPrice)}</span></div>
+            </div>
+        </div>
+        <p className="text-center text-[9px] mt-4">{settings.footerMessage}</p>
+    </div>
+);
+
+// Template 10: Eco Compact
+const Template10 = ({ order, settings, tableNumber }: ReceiptProps) => (
+    <div className="bg-white text-black font-mono w-[80mm] text-[9px] p-1">
+        <p className="text-center font-bold text-xs">{settings.storeName}</p>
+        <p className="text-center text-[8px]">{settings.address}</p>
+        <div className="my-1 border-t border-black" />
+        <p>INV: #{order.orderNumber} | {formatDate(order.timestamp)} | {tableNumber ? `T${tableNumber}` : 'T/A'}</p>
+        <div className="my-1 border-t border-black" />
+        {order.items.map((item, idx) => (
+            <p key={idx}>{item.quantity}x {item.name} - {(item.price * item.quantity).toFixed(2)}</p>
+        ))}
+        <div className="my-1 border-t border-black" />
+        <p>SUB: {(order.subtotal || 0).toFixed(2)} | GST: {((order.cgst || 0) + (order.sgst || 0)).toFixed(2)}</p>
+        <p className="font-bold text-lg text-center my-1">TOTAL: {formatCurrency(order.totalPrice)}</p>
+        <div className="my-1 border-t border-black" />
+        <p className="text-center text-[8px]">{settings.footerMessage}</p>
+        <p className="text-center text-[8px] font-bold">Go Green! Save Paper.</p>
+    </div>
+);
+
 
 export const ReceiptRouter = (props: ReceiptProps) => {
     switch (props.settings.templateId) {
@@ -233,6 +397,11 @@ export const ReceiptRouter = (props: ReceiptProps) => {
         case 'template-3': return <Template3 {...props} />;
         case 'template-4': return <Template4 {...props} />;
         case 'template-5': return <Template5 {...props} />;
+        case 'template-6': return <Template6 {...props} />;
+        case 'template-7': return <Template7 {...props} />;
+        case 'template-8': return <Template8 {...props} />;
+        case 'template-9': return <Template9 {...props} />;
+        case 'template-10': return <Template10 {...props} />;
         case 'template-1':
         default:
             return <Template1 {...props} />;

@@ -232,6 +232,11 @@ export default function SettingsManager() {
                             <SelectItem value="template-3">Compact</SelectItem>
                             <SelectItem value="template-4">Premium</SelectItem>
                             <SelectItem value="template-5">Minimal</SelectItem>
+                            <SelectItem value="template-6">Dot Matrix</SelectItem>
+                            <SelectItem value="template-7">Elegant</SelectItem>
+                            <SelectItem value="template-8">Bold Block</SelectItem>
+                            <SelectItem value="template-9">Two Column</SelectItem>
+                            <SelectItem value="template-10">Eco Compact</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -278,4 +283,3 @@ export default function SettingsManager() {
     </div>
   );
 }
-
