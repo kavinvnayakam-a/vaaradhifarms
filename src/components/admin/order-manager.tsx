@@ -5,11 +5,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { 
   collection, onSnapshot, query, orderBy, doc, 
-  updateDoc, setDoc, addDoc, serverTimestamp, runTransaction 
+  updateDoc, addDoc, serverTimestamp, runTransaction 
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem, Table as TableType } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu, Ticket
+  Printer, Check, Clock, User, Store, X, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, Wallet, Hash, Ticket
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from "@/components/ui/button";
@@ -39,12 +39,17 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   templateId: 'template-1',
 };
 
+function formatTime(timestamp: any) {
+    if (!timestamp) return 'N/A';
+    const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 export default function OrderManager() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [tables, setTables] = useState<TableType[]>([]);
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -62,7 +67,6 @@ export default function OrderManager() {
   const [manualOrderTableId, setManualOrderTableId] = useState('Takeaway');
 
   const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
-  const [tempSettings, setTempSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
 
   useEffect(() => {
     if (!firestore) return;
@@ -80,7 +84,6 @@ export default function OrderManager() {
       if (d.exists()) {
         const settings = { ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings;
         setPrintSettings(settings);
-        setTempSettings(settings);
       }
     });
 
@@ -139,13 +142,6 @@ export default function OrderManager() {
   const executePrint = () => {
     window.print();
     setShowPrintPreview(false);
-  };
-
-  const saveSettings = async () => {
-    if (!firestore) return;
-    await setDoc(doc(firestore, "settings", "print_template"), tempSettings);
-    setShowSettings(false);
-    toast({ title: "Settings Saved" });
   };
 
   const handleAddItem = (item: MenuItem) => {
@@ -265,9 +261,6 @@ export default function OrderManager() {
           >
             <Plus size={18} /> New Manual Order
           </button>
-          <button onClick={() => setShowSettings(true)} className="p-4 bg-white text-zinc-400 rounded-2xl hover:text-primary transition-all border border-zinc-200 shadow-sm">
-            <Settings size={20}/>
-          </button>
         </div>
       </div>
       
@@ -326,7 +319,6 @@ export default function OrderManager() {
                 </div>
 
                 <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                  <Banknote size={16} className="text-primary" />
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Grand Total</span>
                     <span className="text-lg font-black italic text-primary leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
@@ -465,7 +457,7 @@ export default function OrderManager() {
                       </Label>
                       <Label htmlFor="m-cash" className={cn("flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all", paymentMethod === 'Cash' ? "bg-white border-primary text-primary shadow-md" : "bg-white/50 border-zinc-100 text-zinc-400")}>
                         <RadioGroupItem value="Cash" id="m-cash" className="sr-only" />
-                        <Banknote size={16} />
+                        <Wallet size={16} />
                         <span className="text-[8px] font-black uppercase">Cash</span>
                       </Label>
                       <Label htmlFor="m-card" className={cn("flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all", paymentMethod === 'Card' ? "bg-white border-primary text-primary shadow-md" : "bg-white/50 border-zinc-100 text-zinc-400")}>
@@ -553,71 +545,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="sm:max-w-2xl bg-zinc-900 border-zinc-800 text-white rounded-[2rem]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black uppercase italic flex items-center gap-3"><Settings className="text-primary"/>POS Hardware Config</DialogTitle>
-            <DialogDescription className="text-zinc-400 text-xs font-bold uppercase tracking-widest">
-              Calibrate thermal printer and cash drawer settings.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-6 py-4 max-h-[60vh] overflow-y-auto pr-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="storeName" className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
-                <Input id="storeName" value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-              <div>
-                <Label htmlFor="optimizedFor" className="text-[10px] font-black uppercase text-zinc-400">Optimized For</Label>
-                <Input id="optimizedFor" value={tempSettings.optimizedFor} onChange={(e) => setTempSettings(s => ({...s, optimizedFor: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-            </div>
-             <div>
-                <Label htmlFor="templateId" className="text-[10px] font-black uppercase text-zinc-400">Receipt Template</Label>
-                <Select value={tempSettings.templateId} onValueChange={(value) => setTempSettings(s => ({...s, templateId: value as PrintSettings['templateId']}))}>
-                    <SelectTrigger id="templateId" className="bg-zinc-950 border-zinc-800">
-                        <SelectValue placeholder="Select Template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="template-1">Classic</SelectItem>
-                        <SelectItem value="template-2">Modern</SelectItem>
-                        <SelectItem value="template-3">Compact</SelectItem>
-                        <SelectItem value="template-4">Premium</SelectItem>
-                        <SelectItem value="template-5">Minimal</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div>
-              <Label htmlFor="address" className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
-              <Input id="address" value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="phone" className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
-                <Input id="phone" value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-              <div>
-                <Label htmlFor="gstin" className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
-                <Input id="gstin" value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-              <div>
-                <Label htmlFor="fssai" className="text-[10px] font-black uppercase text-zinc-400">FSSAI</Label>
-                <Input id="fssai" value={tempSettings.fssai} onChange={(e) => setTempSettings(s => ({...s, fssai: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="footerMessage" className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
-              <Input id="footerMessage" value={tempSettings.footerMessage} onChange={(e) => setTempSettings(s => ({...s, footerMessage: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={saveSettings} className="bg-primary text-white hover:bg-zinc-900 font-black uppercase text-xs tracking-widest py-3 px-6 h-auto">
-              <Save className="mr-2 h-4 w-4"/>Save Configuration
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-4xl bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
