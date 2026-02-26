@@ -7,12 +7,12 @@ import { collection, onSnapshot, addDoc, deleteDoc, doc, query, orderBy, setDoc 
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Table as TableType } from '@/lib/types';
+import { Table as TableType, Order } from '@/lib/types';
 import { Plus, Trash2, Loader2, Armchair, Settings, Save, Printer } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { PrintSettings as AppPrintSettings } from './receipt-templates';
+import { ReceiptRouter, type PrintSettings as AppPrintSettings } from './receipt-templates';
 
 interface PrintSettings extends AppPrintSettings {}
 
@@ -27,6 +27,29 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   triggerCashDrawer: false,
   optimizedFor: "Restsol RTP-81",
   templateId: 'template-1',
+};
+
+// Mock order for preview
+const mockOrder: Order = {
+  id: 'preview-123',
+  tableId: '5',
+  customerName: 'Preview Customer',
+  customerPhone: '9876543210',
+  paymentMethod: 'UPI',
+  items: [
+    { id: 'item-1', name: 'Special Chicken Biryani', price: 262, quantity: 1, category: 'Biryani', description: '', image: '', available: true },
+    { id: 'item-2', name: 'Chicken 65', price: 189, quantity: 1, category: 'Starters', description: '', image: '', available: true },
+    { id: 'item-3', name: 'Thumsup Tin', price: 40, quantity: 2, category: 'Beverages', description: '', image: '', available: true },
+  ],
+  totalPrice: 597,
+  subtotal: 568.57,
+  cgst: 14.21,
+  sgst: 14.21,
+  roundOff: 0.01,
+  status: 'Completed',
+  timestamp: { seconds: Date.now() / 1000, nanoseconds: 0 },
+  orderNumber: '0042',
+  createdAt: Date.now(),
 };
 
 export default function SettingsManager() {
@@ -177,63 +200,75 @@ export default function SettingsManager() {
       </div>
       
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="sm:max-w-2xl bg-zinc-900 border-zinc-800 text-white rounded-[2rem]">
-          <DialogHeader>
+        <DialogContent className="max-w-5xl bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
+          <DialogHeader className="p-8 border-b border-zinc-800">
             <DialogTitle className="text-xl font-black uppercase italic flex items-center gap-3"><Settings className="text-primary"/>POS Hardware Config</DialogTitle>
             <DialogDescription className="text-zinc-400 text-xs font-bold uppercase tracking-widest">
               Calibrate thermal printer and cash drawer settings.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-6 py-4 max-h-[60vh] overflow-y-auto pr-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="storeName" className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
-                <Input id="storeName" value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-              <div>
-                <Label htmlFor="optimizedFor" className="text-[10px] font-black uppercase text-zinc-400">Optimized For</Label>
-                <Input id="optimizedFor" value={tempSettings.optimizedFor} onChange={(e) => setTempSettings(s => ({...s, optimizedFor: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+          <div className="flex h-[65vh]">
+            <div className="w-1/2 overflow-y-auto p-8 custom-scrollbar">
+                <div className="grid gap-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="storeName" className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
+                    <Input id="storeName" value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                  </div>
+                  <div>
+                    <Label htmlFor="optimizedFor" className="text-[10px] font-black uppercase text-zinc-400">Optimized For</Label>
+                    <Input id="optimizedFor" value={tempSettings.optimizedFor} onChange={(e) => setTempSettings(s => ({...s, optimizedFor: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                  </div>
+                </div>
+                 <div>
+                    <Label htmlFor="templateId" className="text-[10px] font-black uppercase text-zinc-400">Receipt Template</Label>
+                    <Select value={tempSettings.templateId} onValueChange={(value) => setTempSettings(s => ({...s, templateId: value as PrintSettings['templateId']}))}>
+                        <SelectTrigger id="templateId" className="bg-zinc-950 border-zinc-800">
+                            <SelectValue placeholder="Select Template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="template-1">Classic</SelectItem>
+                            <SelectItem value="template-2">Modern</SelectItem>
+                            <SelectItem value="template-3">Compact</SelectItem>
+                            <SelectItem value="template-4">Premium</SelectItem>
+                            <SelectItem value="template-5">Minimal</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                  <Label htmlFor="address" className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
+                  <Input id="address" value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="phone" className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
+                    <Input id="phone" value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                  </div>
+                  <div>
+                    <Label htmlFor="gstin" className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
+                    <Input id="gstin" value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                  </div>
+                  <div>
+                    <Label htmlFor="fssai" className="text-[10px] font-black uppercase text-zinc-400">FSSAI</Label>
+                    <Input id="fssai" value={tempSettings.fssai} onChange={(e) => setTempSettings(s => ({...s, fssai: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="footerMessage" className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
+                  <Input id="footerMessage" value={tempSettings.footerMessage} onChange={(e) => setTempSettings(s => ({...s, footerMessage: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+                </div>
               </div>
             </div>
-             <div>
-                <Label htmlFor="templateId" className="text-[10px] font-black uppercase text-zinc-400">Receipt Template</Label>
-                <Select value={tempSettings.templateId} onValueChange={(value) => setTempSettings(s => ({...s, templateId: value as PrintSettings['templateId']}))}>
-                    <SelectTrigger id="templateId" className="bg-zinc-950 border-zinc-800">
-                        <SelectValue placeholder="Select Template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="template-1">Classic</SelectItem>
-                        <SelectItem value="template-2">Modern</SelectItem>
-                        <SelectItem value="template-3">Compact</SelectItem>
-                        <SelectItem value="template-4">Premium</SelectItem>
-                        <SelectItem value="template-5">Minimal</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div>
-              <Label htmlFor="address" className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
-              <Input id="address" value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="phone" className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
-                <Input id="phone" value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+            <div className="w-1/2 bg-zinc-950 p-8 flex flex-col items-center justify-start overflow-y-auto">
+              <div className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-4">
+                  Live Preview
               </div>
-              <div>
-                <Label htmlFor="gstin" className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
-                <Input id="gstin" value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              <div className="scale-[0.9] origin-top">
+                  <ReceiptRouter order={mockOrder} settings={tempSettings} tableNumber="5" />
               </div>
-              <div>
-                <Label htmlFor="fssai" className="text-[10px] font-black uppercase text-zinc-400">FSSAI</Label>
-                <Input id="fssai" value={tempSettings.fssai} onChange={(e) => setTempSettings(s => ({...s, fssai: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="footerMessage" className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
-              <Input id="footerMessage" value={tempSettings.footerMessage} onChange={(e) => setTempSettings(s => ({...s, footerMessage: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="p-8 bg-zinc-900 border-t border-zinc-800">
             <Button onClick={saveSettings} className="bg-primary text-white hover:bg-zinc-900 font-black uppercase text-xs tracking-widest py-3 px-6 h-auto">
               <Save className="mr-2 h-4 w-4"/>Save Configuration
             </Button>
@@ -243,3 +278,4 @@ export default function SettingsManager() {
     </div>
   );
 }
+
