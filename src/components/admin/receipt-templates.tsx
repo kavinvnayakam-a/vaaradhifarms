@@ -410,25 +410,27 @@ export const ReceiptRouter = (props: ReceiptProps) => {
 };
 
 export const KOTComponent = ({ order, tableNumber }: { order: Order, tableNumber: string | null }) => (
-    <div className="bg-white text-black p-2 font-mono w-[80mm] text-[11px]">
+    <div className="bg-white text-black p-4 font-mono w-[80mm] text-[12px]">
         <div className="text-center">
-            <p className="text-xl font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2 mb-2">KOT</p>
-            <h1 className="text-5xl font-black italic leading-none my-2">
+            <p className="text-2xl font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2 mb-2">
+                K.O.T
+            </p>
+            <h1 className="text-6xl font-black italic leading-none my-4">
                 {tableNumber ? `T-${tableNumber}` : `#${order?.orderNumber}`}
             </h1>
-            <p className="text-lg font-black mt-1">
+            <p className="text-xl font-bold mt-1">
                 {tableNumber ? '(Dine-In)' : `(${order.customerName || 'Takeaway'})`}
             </p>
         </div>
-        <div className="border-y border-dashed border-black my-3 py-2 text-left space-y-1">
+        <div className="border-y-2 border-dashed border-black my-4 py-3 text-left space-y-2">
             {order.items.map((item, idx) => (
-                <div key={idx} className="flex text-sm">
-                    <span className="w-6 font-black">{item.quantity}x</span>
+                <div key={idx} className="flex text-base">
+                    <span className="w-8 font-black">{item.quantity}x</span>
                     <span className="flex-1 font-bold uppercase">{item.name}</span>
                 </div>
             ))}
         </div>
-        <div className="flex justify-between text-[10px] font-bold">
+        <div className="flex justify-between text-[11px] font-bold">
             <span>{formatDate(order.timestamp)}</span>
             <span>{formatTime(order.timestamp)}</span>
         </div>
@@ -436,21 +438,25 @@ export const KOTComponent = ({ order, tableNumber }: { order: Order, tableNumber
 );
 
 export const CollectionTokenComponent = ({ order }: { order: Order }) => (
-    <div className="bg-white text-black p-2 font-mono w-[80mm] text-center text-[11px]">
-        <p className="text-base font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2">Collection Token</p>
-        <p className="text-xs font-bold mt-2">Order For: {order.customerName}</p>
-        <h1 className="text-8xl font-black italic leading-none my-3">#{order.orderNumber}</h1>
-        <div className="border-t border-dashed border-black pt-2 mt-2 text-left">
-            <p className="text-center font-bold uppercase text-xs mb-1">Items Summary:</p>
-            {order.items.map((item, idx) => (
-                <p key={idx} className="text-xs font-semibold uppercase">
-                    - {item.quantity}x {item.name}
-                </p>
-            ))}
+    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center">
+        <p className="text-lg font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2">
+            Collection Token
+        </p>
+        <p className="text-sm font-bold mt-4">Order For: {order.customerName}</p>
+        <h1 className="text-9xl font-black italic leading-none my-4">#{order.orderNumber}</h1>
+        <div className="border-t-2 border-dashed border-black pt-3 mt-3 text-left">
+            <p className="text-center font-bold uppercase text-sm mb-2">Items Summary:</p>
+            <div className="space-y-1">
+                {order.items.map((item, idx) => (
+                    <p key={idx} className="text-sm font-semibold uppercase">
+                        - {item.quantity}x {item.name}
+                    </p>
+                ))}
+            </div>
         </div>
-        <div className="border-t border-dashed border-black mt-3 pt-2">
-            <p className="text-center text-xs font-bold">Please show this token at the pickup counter.</p>
-            <p className="text-center text-[10px] font-bold">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
+        <div className="border-t-2 border-dashed border-black mt-4 pt-3">
+            <p className="text-center text-sm font-bold">Please show this token at the pickup counter.</p>
+            <p className="text-center text-[10px] font-bold mt-1">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
         </div>
     </div>
 );
