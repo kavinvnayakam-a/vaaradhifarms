@@ -21,19 +21,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ReceiptRouter, KOTComponent, CollectionTokenComponent, PrintSettings as AppPrintSettings } from './receipt-templates';
 
 
-interface PrintSettings {
-  storeName: string;
-  address: string;
-  phone: string;
-  gstin: string;
-  fssai: string;
-  footerMessage: string;
-  paperWidth: '58mm' | '80mm';
-  triggerCashDrawer: boolean;
-  optimizedFor: string;
-}
+interface PrintSettings extends AppPrintSettings {}
 
 const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   storeName: "Dindigul Ananda's Briyani",
@@ -44,7 +35,8 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   footerMessage: "Thank you for visiting Dindigul Ananda's Briyani!",
   paperWidth: '80mm',
   triggerCashDrawer: false,
-  optimizedFor: "Restsol RTP-81"
+  optimizedFor: "Restsol RTP-81",
+  templateId: 'template-1',
 };
 
 export default function OrderManager() {
@@ -580,6 +572,21 @@ export default function OrderManager() {
                 <Input id="optimizedFor" value={tempSettings.optimizedFor} onChange={(e) => setTempSettings(s => ({...s, optimizedFor: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
               </div>
             </div>
+             <div>
+                <Label htmlFor="templateId" className="text-[10px] font-black uppercase text-zinc-400">Receipt Template</Label>
+                <Select value={tempSettings.templateId} onValueChange={(value) => setTempSettings(s => ({...s, templateId: value as PrintSettings['templateId']}))}>
+                    <SelectTrigger id="templateId" className="bg-zinc-950 border-zinc-800">
+                        <SelectValue placeholder="Select Template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="template-1">Classic</SelectItem>
+                        <SelectItem value="template-2">Modern</SelectItem>
+                        <SelectItem value="template-3">Compact</SelectItem>
+                        <SelectItem value="template-4">Premium</SelectItem>
+                        <SelectItem value="template-5">Minimal</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
             <div>
               <Label htmlFor="address" className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
               <Input id="address" value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
@@ -628,7 +635,7 @@ export default function OrderManager() {
           <div className="p-10 bg-zinc-950 flex flex-col md:flex-row items-start justify-center gap-10 no-print overflow-y-auto max-h-[60vh]">
             <div className="w-[302px] flex-shrink-0">
               <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Receipt</p>
-              {printingOrder && <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />}
+              {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />}
             </div>
 
             {printingOrder && printingOrder.tableId === 'Takeaway' && (
@@ -656,26 +663,21 @@ export default function OrderManager() {
         {printingOrder && (
           printingOrder.tableId === 'Takeaway' ? (
             <>
-              {/* Page 1: Invoice */}
               <div style={{ breakAfter: 'page' }}>
-                <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={null} />
+                <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />
               </div>
-              {/* Page 2: Collection Token */}
               <div style={{ breakAfter: 'page' }}>
                 <CollectionTokenComponent order={printingOrder} />
               </div>
-              {/* Page 3: KOT */}
               <div>
                 <KOTComponent order={printingOrder} tableNumber={null} />
               </div>
             </>
           ) : (
             <>
-              {/* Dine-in: Receipt */}
               <div style={{ breakAfter: 'page' }}>
-                <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />
+                <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />
               </div>
-              {/* Dine-in: KOT */}
               <div>
                 <KOTComponent order={printingOrder} tableNumber={tableNumberForPrinting} />
               </div>
@@ -686,120 +688,3 @@ export default function OrderManager() {
     </div>
   );
 }
-
-const formatTime = (ts: any) => {
-    if (!ts) return "";
-    const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-};
-  
-const formatDate = (ts: any) => {
-    if (!ts) return "";
-    const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-const ReceiptComponent = ({ order, settings, tableNumber }: { order: Order, settings: PrintSettings, tableNumber: string | null }) => (
-    <div className="bg-white text-black p-1 shadow-2xl font-mono text-[11px] w-[80mm]">
-      <div className="text-center mb-2">
-          <h2 className="text-lg font-black uppercase">{settings.storeName}</h2>
-          <p className="text-[9px] uppercase font-bold leading-tight px-4">{settings.address}</p>
-          <p className="text-[9px] font-bold">PH: {settings.phone}</p>
-          <p className="text-[9px] font-bold">GSTIN: {settings.gstin}</p>
-      </div>
-      <div className="border-y border-dashed border-black py-1 my-2 text-[10px]">
-          <div className="flex justify-between">
-              <span>Date: {formatDate(order.timestamp)}</span>
-              <span>Time: {formatTime(order.timestamp)}</span>
-          </div>
-          <div className="flex justify-between font-black">
-              {tableNumber 
-                  ? <span>Table No.: {tableNumber}</span>
-                  : <span>Token No.: #{order.orderNumber}</span>
-              }
-              <span>{tableNumber ? 'Dine-In' : 'Takeaway'}</span>
-          </div>
-          <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
-              <span className="uppercase">Cust: {order.customerName}</span>
-          </div>
-      </div>
-      <table className="w-full text-[10px]">
-          <thead>
-              <tr className="border-b border-dashed border-black">
-                  <th className="text-left font-bold uppercase pb-1">Item</th>
-                  <th className="text-center font-bold uppercase pb-1">Qty</th>
-                  <th className="text-right font-bold uppercase pb-1">Price</th>
-              </tr>
-          </thead>
-          <tbody>
-              {order?.items.map((item, idx) => (
-                  <tr key={idx} className="font-bold">
-                      <td className="py-1 uppercase">{item.name}</td>
-                      <td className="text-center py-1">{item.quantity}</td>
-                      <td className="text-right py-1">{(item.price * item.quantity).toFixed(2)}</td>
-                  </tr>
-              ))}
-          </tbody>
-      </table>
-      <div className="border-t border-dashed border-black pt-2 mt-2 space-y-1 text-right text-[10px] font-bold">
-          <div className="flex justify-between"><span>Sub Total</span> <span>{(order?.subtotal || 0).toFixed(2)}</span></div>
-          <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{(order?.cgst || 0).toFixed(2)}</span></div>
-          <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{(order?.sgst || 0).toFixed(2)}</span></div>
-          {(order?.roundOff || 0) !== 0 && (
-              <div className="flex justify-between"><span>Round off</span> <span>{order?.roundOff?.toFixed(2)}</span></div>
-          )}
-          <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-1 mt-1">
-              <span>TOTAL</span>
-              <span>{formatCurrency(order?.totalPrice || 0)}</span>
-          </div>
-          {order?.paymentMethod === 'Cash' && order.cashReceived != null && (
-              <div className="pt-2 mt-2 border-t border-dashed border-black/40 text-xs">
-                <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(order.cashReceived)}</span></div>
-                <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(order.changeDue || 0)}</span></div>
-              </div>
-          )}
-      </div>
-      <div className="text-center mt-4 border-t border-dashed border-black pt-2">
-          <p className="text-[9px] font-bold uppercase italic">{settings.footerMessage}</p>
-      </div>
-  </div>
-);
-
-const KOTComponent = ({ order, tableNumber }: { order: Order, tableNumber: string | null }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm]">
-        <div className="text-center">
-            <p className="text-lg font-black uppercase tracking-widest">KOT</p>
-            <h1 className="text-6xl font-black italic leading-none my-2">
-                {tableNumber ? `T${tableNumber}` : `#${order?.orderNumber}`}
-            </h1>
-            <p className="text-xl font-black mt-2">
-                {tableNumber ? '(Dine-In)' : `(${order.customerName})`}
-            </p>
-        </div>
-        <div className="border-y border-dashed border-black my-4 py-2 text-left">
-            {order.items.map((item, idx) => (
-                <p key={idx} className="text-lg font-black uppercase">
-                    {item.quantity}x {item.name}
-                </p>
-            ))}
-        </div>
-        <p className="text-center text-xs">{formatTime(order.timestamp)}</p>
-    </div>
-);
-
-const CollectionTokenComponent = ({ order }: { order: Order }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center">
-        <p className="text-lg font-black uppercase tracking-widest">Collection Token</p>
-        <h1 className="text-8xl font-black italic leading-none my-4">#{order.orderNumber}</h1>
-        <div className="border-y border-dashed border-black py-2 my-2 text-left">
-            <p className="text-xl font-black uppercase mb-1">{order.customerName}</p>
-            {order.items.map((item, idx) => (
-                <p key={idx} className="text-base font-black uppercase">
-                    {item.quantity}x {item.name}
-                </p>
-            ))}
-        </div>
-        <p className="text-center text-xs mt-4 font-bold">Please show this token at the pickup counter.</p>
-        <p className="text-center text-xs font-bold">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
-    </div>
-);
