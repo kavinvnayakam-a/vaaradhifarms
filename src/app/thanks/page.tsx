@@ -72,7 +72,7 @@ export default function ThankYouPage() {
           </div>
         </Link>
 
-        <Link href="https://www.getpik.in/pos" target="_blank" className="block mt-12">
+        <Link href="https://www.getpik.in/pos" target="_blank" className="flex justify-center mt-12">
           <GetPikLogo variant="opacity" />
         </Link>
       </div>
