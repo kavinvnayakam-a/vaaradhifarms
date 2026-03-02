@@ -44,7 +44,6 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
               {formatCurrency(item.price)}
            </span>
            
-           {/* Desktop Only Button (Hidden on Mobile inside this block) */}
            <button
             onClick={() => onAddToCart(item)}
             disabled={isSoldOut}
@@ -66,61 +65,69 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
       </div>
 
       {/* Image & Mobile Button Section */}
-      <div className="relative w-28 h-28 sm:w-full sm:h-72 shrink-0 order-2 sm:order-1">
-        {shouldShowImage ? (
-          <div className="relative w-full h-full rounded-2xl sm:rounded-none overflow-hidden shadow-md sm:shadow-none">
-            <Image
-              src={item.image}
-              alt={item.name}
-              fill
-              className={cn(
-                "object-cover transition-transform duration-[1.5s] ease-out",
-                !isSoldOut && "group-hover:scale-110"
+      <div className={cn(
+        "relative shrink-0 transition-all duration-500",
+        shouldShowImage 
+          ? "w-28 h-28 sm:w-full sm:h-72 order-2 sm:order-1" 
+          : "w-0 h-0 sm:w-0 sm:h-0 overflow-hidden opacity-0 pointer-events-none"
+      )}>
+        {shouldShowImage && (
+          <>
+            <div className="relative w-full h-full rounded-2xl sm:rounded-none overflow-hidden shadow-md sm:shadow-none">
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className={cn(
+                  "object-cover transition-transform duration-[1.5s] ease-out",
+                  !isSoldOut && "group-hover:scale-110"
+                )}
+                sizes="(max-width: 768px) 150px, 400px"
+              />
+              {isSoldOut && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
+                  <span className="text-white text-[8px] font-black uppercase tracking-widest">Out</span>
+                </div>
               )}
-              sizes="(max-width: 768px) 150px, 400px"
-            />
-            {isSoldOut && (
-              <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-                <span className="text-white text-[8px] font-black uppercase tracking-widest">Out</span>
+            </div>
+
+            {/* Premium Badge Desktop Only */}
+            {!isSoldOut && (
+              <div className="absolute top-4 right-4 z-10 hidden sm:block">
+                <div className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full flex items-center gap-2 shadow-xl">
+                  <Star size={10} className="text-background fill-background" />
+                  <span className="text-background font-black text-[9px] uppercase tracking-widest">Premium</span>
+                </div>
               </div>
             )}
-          </div>
-        ) : (
-          <div className="w-full h-full bg-orange-50 rounded-2xl sm:rounded-none flex items-center justify-center">
-             <Leaf className="text-background/10 w-8 h-8" />
-          </div>
+          </>
         )}
+      </div>
 
-        {/* Mobile Add Button - Overlapping Image */}
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-30 sm:hidden">
-          <button
-            onClick={() => onAddToCart(item)}
-            disabled={isSoldOut}
-            className={cn(
-              "h-10 px-6 rounded-xl flex items-center justify-center gap-2 transition-all font-black uppercase text-[10px] italic shadow-xl border-2 border-white",
-              isSoldOut 
-                ? "bg-zinc-100 text-zinc-300 cursor-not-allowed" 
-                : "bg-white text-background active:scale-90"
-            )}
-          >
-            {isSoldOut ? 'Sold' : (
-              <>
-                <span>Add</span>
-                <Plus size={14} strokeWidth={4} />
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Premium Badge Desktop Only */}
-        {!isSoldOut && shouldShowImage && (
-          <div className="absolute top-4 right-4 z-10 hidden sm:block">
-            <div className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full flex items-center gap-2 shadow-xl">
-              <Star size={10} className="text-background fill-background" />
-              <span className="text-background font-black text-[9px] uppercase tracking-widest">Premium</span>
-            </div>
-          </div>
-        )}
+      {/* Mobile Add Button - Positioned dynamically if image is hidden */}
+      <div className={cn(
+        "z-30 sm:hidden transition-all duration-500",
+        shouldShowImage 
+          ? "absolute bottom-2 left-auto right-4 sm:left-1/2 sm:-translate-x-1/2" 
+          : "relative mt-auto ml-auto"
+      )}>
+        <button
+          onClick={() => onAddToCart(item)}
+          disabled={isSoldOut}
+          className={cn(
+            "h-10 px-6 rounded-xl flex items-center justify-center gap-2 transition-all font-black uppercase text-[10px] italic shadow-xl border-2 border-white",
+            isSoldOut 
+              ? "bg-zinc-100 text-zinc-300 cursor-not-allowed" 
+              : "bg-background text-white active:scale-90"
+          )}
+        >
+          {isSoldOut ? 'Sold' : (
+            <>
+              <span>Add</span>
+              <Plus size={14} strokeWidth={4} />
+            </>
+          )}
+        </button>
       </div>
 
       {/* Decorative Border for Mobile List */}

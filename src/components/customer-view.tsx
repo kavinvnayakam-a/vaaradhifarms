@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { useFirestore } from '@/firebase'; 
-import { collection, onSnapshot, query } from 'firebase/firestore'; 
+import { collection, onSnapshot, query, doc } from 'firebase/firestore'; 
 import { Header } from '@/components/header';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { CartSheet } from '@/components/cart-sheet';
@@ -17,6 +17,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const [isCartOpen, setCartOpen] = useState(false);
   const firestore = useFirestore();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [globalShowImages, setGlobalShowImages] = useState(true);
   const [loading, setLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("");
@@ -31,13 +32,26 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
   useEffect(() => {
     if (!firestore) return;
+    
+    // Fetch menu items
     const q = query(collection(firestore, "menu_items")); 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubItems = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MenuItem[];
       setMenuItems(items);
       setLoading(false);
     }, () => setLoading(false));
-    return () => unsubscribe(); 
+
+    // Fetch global menu configuration
+    const unsubSettings = onSnapshot(doc(firestore, "settings", "menu_config"), (snapshot) => {
+      if (snapshot.exists()) {
+        setGlobalShowImages(snapshot.data().globalShowImages);
+      }
+    });
+
+    return () => {
+      unsubItems();
+      unsubSettings();
+    };
   }, [firestore]);
 
   useEffect(() => {
@@ -170,7 +184,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-14 bg-white/5 sm:bg-transparent">
                 {items.map((item) => (
-                  <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+                  <MenuItemCard 
+                    key={item.id} 
+                    item={item} 
+                    onAddToCart={addToCart} 
+                    globalShowImages={globalShowImages}
+                  />
                 ))}
               </div>
             </section>

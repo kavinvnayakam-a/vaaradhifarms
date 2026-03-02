@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingBag, Loader2, ImageIcon, CreditCard, Banknote, Smartphone, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Loader2, CreditCard, Banknote, Smartphone, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFirestore } from "@/firebase";
@@ -83,7 +82,6 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           name: item.name,
           price: item.price,
           quantity: item.quantity,
-          image: item.image
         })),
         subtotal: subtotal,
         cgst: cgst,
@@ -140,57 +138,41 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                 <p className="text-zinc-300 font-black uppercase tracking-[0.5em] text-[11px]">Your tray is empty</p>
               </div>
             ) : (
-              <div className="space-y-10">
+              <div className="space-y-8">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-start gap-6 animate-in fade-in slide-in-from-right-10 duration-700">
-                    <div className="relative h-24 w-24 shrink-0 shadow-2xl">
-                      {item.image ? (
-                        <Image 
-                          src={item.image} 
-                          alt={item.name} 
-                          fill 
-                          className="rounded-[2rem] object-cover border-4 border-white shadow-xl"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center rounded-[2rem] bg-zinc-50 border-2 border-dashed border-zinc-100">
-                          <ImageIcon className="h-8 w-8 text-zinc-200" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 pt-2">
-                      <p className="font-black text-background text-lg leading-none truncate uppercase italic">
+                  <div key={item.id} className="flex items-center justify-between gap-4 animate-in fade-in slide-in-from-right-10 duration-700">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-background text-base leading-tight truncate uppercase italic">
                         {item.name}
                       </p>
-                      <p className="text-zinc-400 font-bold text-sm mt-2 tabular-nums">
-                        {formatCurrency(item.price)}
+                      <p className="text-zinc-400 font-bold text-xs mt-1 tabular-nums">
+                        {formatCurrency(item.price)} per unit
                       </p>
-                      
-                      <div className="flex items-center gap-5 mt-6">
-                        <div className="flex items-center bg-zinc-50 rounded-2xl border border-zinc-100 p-1.5">
-                          <button 
-                            className="w-10 h-10 flex items-center justify-center hover:bg-white hover:text-background rounded-xl transition-all text-zinc-300"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >
-                            <Minus className="h-5 w-5"/>
-                          </button>
-                          <span className="w-12 text-center font-black text-lg text-background tabular-nums italic">{item.quantity}</span>
-                          <button 
-                            className="w-10 h-10 flex items-center justify-center hover:bg-white hover:text-background rounded-xl transition-all text-zinc-300"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
-                            <Plus className="h-5 w-5"/>
-                          </button>
-                        </div>
-                      </div>
                     </div>
-
-                    <button 
-                      className="p-4 text-zinc-200 hover:text-rose-500 transition-colors mt-2"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      <Trash2 className="h-6 w-6"/>
-                    </button>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center bg-zinc-50 rounded-xl border border-zinc-100 p-1">
+                        <button 
+                          className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-background rounded-lg transition-all text-zinc-300"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          <Minus className="h-4 w-4"/>
+                        </button>
+                        <span className="w-10 text-center font-black text-base text-background tabular-nums italic">{item.quantity}</span>
+                        <button 
+                          className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-background rounded-lg transition-all text-zinc-300"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-4 w-4"/>
+                        </button>
+                      </div>
+                      <button 
+                        className="p-2 text-zinc-200 hover:text-rose-500 transition-colors"
+                        onClick={() => removeFromCart(item.id)}
+                      >
+                        <Trash2 className="h-5 w-5"/>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
