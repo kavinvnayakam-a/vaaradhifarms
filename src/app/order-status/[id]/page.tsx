@@ -12,13 +12,16 @@ import {
   ShieldAlert,
   BellRing,
   Clock,
-  ArrowLeft
+  ArrowLeft,
+  Gamepad2,
+  Sparkles
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 import { GetPikLogo } from '@/components/getpik-logo';
+import { StatusVisualizer } from '@/components/status-visualizer';
+import { HarvestGame } from '@/components/harvest-game';
 
-const HERO_IMG = "https://picsum.photos/seed/farm_fresh/1200/800";
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
@@ -38,6 +41,7 @@ export default function OrderStatusPage() {
   const { data: order, isLoading } = useDoc<Order>(orderRef);
   const [timeLeft, setTimeLeft] = useState(PICKUP_TIMER_DURATION);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [showGame, setShowGame] = useState(false);
   const audioPlayed = useRef(false);
 
   useEffect(() => {
@@ -110,18 +114,38 @@ export default function OrderStatusPage() {
         <div className="absolute bottom-0 right-0 w-[80%] h-[80%] bg-white/5 blur-[120px] rounded-full translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div className="relative h-[40vh] w-full overflow-hidden bg-primary flex items-center justify-center">
-        <Image src={HERO_IMG} alt="Farm Fresh" fill className="object-cover opacity-20" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      {/* Dynamic Animated Header */}
+      <div className="relative h-[45vh] w-full overflow-hidden bg-primary/20 flex flex-col items-center justify-center">
+        <StatusVisualizer status={order?.status || 'Pending'} />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         
-        <div className="relative z-30 animate-in fade-in zoom-in duration-1000">
-          <div className="relative group p-10 bg-white rounded-[3.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border-4 border-white/30 transform transition-transform hover:scale-105 duration-700">
-            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={180} height={78} className="object-contain" />
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30">
+          <div className="bg-white px-8 py-3 rounded-2xl shadow-2xl border-4 border-white/30 transform hover:scale-105 transition-all duration-700">
+            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={140} height={60} className="object-contain" />
           </div>
         </div>
       </div>
 
       <div className="relative -mt-20 px-6 z-20 max-w-lg mx-auto">
+        {/* Play Game Button */}
+        {['Received', 'Preparing', 'Served'].includes(order?.status || '') && (
+          <div className="mb-10 flex justify-center animate-in slide-in-from-top-10 duration-1000">
+            <button 
+              onClick={() => setShowGame(true)}
+              className="group relative flex items-center gap-4 bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-4 rounded-[2rem] hover:bg-white transition-all duration-500 hover:scale-105 shadow-2xl"
+            >
+              <div className="bg-background text-white p-2 rounded-xl group-hover:bg-background group-hover:animate-bounce">
+                <Gamepad2 size={20} />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-background/40">While you wait</span>
+                <span className="font-black italic uppercase text-white group-hover:text-background tracking-tighter">Harvest Dash Mini-Game</span>
+              </div>
+              <Sparkles size={16} className="text-amber-300 animate-pulse ml-2" />
+            </button>
+          </div>
+        )}
+
         <div className="bg-white/10 backdrop-blur-3xl rounded-[4rem] p-10 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/20 animate-in slide-in-from-bottom-10 duration-1000">
           
           <div className="mb-12 pb-8 border-b border-white/10 flex flex-col items-center gap-2">
@@ -178,6 +202,9 @@ export default function OrderStatusPage() {
           <GetPikLogo variant="opacity" className="scale-90" />
         </div>
       </div>
+
+      {/* Mini Game Modal */}
+      {showGame && <HarvestGame onClose={() => setShowGame(false)} />}
     </div>
   );
 }
