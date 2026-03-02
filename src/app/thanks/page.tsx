@@ -54,7 +54,7 @@ export default function ThankYouPage() {
         </div>
 
         <Link 
-          href="https://maps.app.goo.gl/xsrDeboZjQASi7eE8" 
+          href="https://maps.app.goo.gl/vJ6H24pbGFyChUfRA" 
           target="_blank"
           className="block w-full bg-white/10 backdrop-blur-xl p-10 rounded-[3.5rem] shadow-2xl border border-white/20 group transition-all duration-500 hover:scale-[1.02] text-white"
         >
