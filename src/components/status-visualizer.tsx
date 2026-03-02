@@ -11,10 +11,8 @@ export function StatusVisualizer({ status }: { status: Status }) {
   const isPending = status === 'Pending';
   // Character wakes up and cooks when order is Received, Preparing, or Served
   const isPreparing = ['Received', 'Preparing', 'Served'].includes(status);
-  // Character is ready when status is Ready
-  const isReady = status === 'Ready';
-  // Character runs sideways to deliver when status is Handover or Completed
-  const isHandover = ['Handover', 'Completed'].includes(status);
+  // Character runs sideways to deliver when status is Ready, Handover, or Completed
+  const isDelivering = ['Ready', 'Handover', 'Completed'].includes(status);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-end pb-12 overflow-hidden">
@@ -24,14 +22,14 @@ export function StatusVisualizer({ status }: { status: Status }) {
         <div className={cn(
           "relative transition-all duration-1000", 
           isPreparing && "animate-bounce",
-          isHandover && "animate-slide-in translate-x-[-20px]" // Subtle forward lean for running
+          isDelivering && "animate-slide-in translate-x-[-20px]" // Fast lean for running
         )}>
           {/* Subtle Glow */}
           <div className="absolute -inset-10 bg-white/5 blur-[60px] rounded-full" />
           
           <svg viewBox="0 0 200 200" className={cn(
             "w-64 h-64 drop-shadow-[0_10px_30px_rgba(0,0,0,0.2)]",
-            isHandover && "animate-sway" // Running/Waddling effect
+            isDelivering && "animate-sway" // Fast Running effect
           )}>
             {/* Chef Hat */}
             <path d="M80 45 Q 100 15 120 45" fill="white" stroke="white" strokeWidth="2" />
@@ -48,7 +46,7 @@ export function StatusVisualizer({ status }: { status: Status }) {
               </g>
             )}
             
-            {(isPreparing || isReady || isHandover) && (
+            {(isPreparing || isDelivering) && (
               <g>
                 {/* Waking Up / Joyful Eyes */}
                 <circle cx="88" cy="70" r="3" fill="#f38221" />
@@ -83,8 +81,8 @@ export function StatusVisualizer({ status }: { status: Status }) {
               </>
             )}
 
-            {/* Step 3: Ready and Smiling with Bag */}
-            {(isReady || isHandover) && (
+            {/* Step 3: Fast Running with Bag (Delivering) */}
+            {isDelivering && (
               <g>
                 <circle cx="150" cy="140" r="40" fill="white" opacity="0.05" className="animate-pulse" />
                 <g className="animate-float" style={{ transform: 'translate(40px, 40px)' }}>
@@ -92,20 +90,15 @@ export function StatusVisualizer({ status }: { status: Status }) {
                    <path d="M135 110 Q 150 80 165 110" stroke="white" strokeWidth="3" fill="none" />
                    <circle cx="150" cy="135" r="6" fill="#f38221" />
                 </g>
-              </g>
-            )}
-
-            {/* Running Legs for Handover */}
-            {isHandover && (
-              <g fill="white">
-                <rect x="80" y="160" width="8" height="20" rx="4" className="animate-sway" />
-                <rect x="112" y="160" width="8" height="20" rx="4" className="animate-sway" style={{ animationDelay: '0.5s' }} />
+                {/* Running Legs */}
+                <rect x="80" y="160" width="8" height="20" rx="4" fill="white" className="animate-sway" />
+                <rect x="112" y="160" width="8" height="20" rx="4" fill="white" className="animate-sway" style={{ animationDelay: '0.5s' }} />
               </g>
             )}
           </svg>
 
-          {/* Heart for Handover */}
-          {isHandover && (
+          {/* Heart for Delivery */}
+          {isDelivering && (
             <div className="absolute top-0 right-0 animate-bounce">
               <Heart size={32} className="text-white fill-white" />
             </div>
@@ -128,15 +121,20 @@ export function StatusVisualizer({ status }: { status: Status }) {
                 </span>
               </div>
             )}
-            {isReady && (
-              <div className="flex items-center gap-3">
-                <Sparkles size={16} className="text-amber-300 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
-                  The Harvest is Ready!
+            {status === 'Ready' && (
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-3">
+                  <Sparkles size={16} className="text-amber-300 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
+                    The Harvest is Ready!
+                  </span>
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">
+                  Please collect your food at the counter
                 </span>
               </div>
             )}
-            {isHandover && (
+            {(status === 'Handover' || status === 'Completed') && (
               <div className="flex items-center gap-3">
                 <Heart size={16} className="text-rose-400 fill-rose-400 animate-pulse" />
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
