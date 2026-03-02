@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -10,7 +9,6 @@ import {
   CheckCircle2, 
   ChefHat, 
   Star,
-  PackageCheck,
   ShieldAlert,
   BellRing,
   Clock
@@ -18,11 +16,11 @@ import {
 import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 
-const HALEEM_HERO = "https://picsum.photos/seed/briyani_hero/1200/800";
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
+const HERO_IMG = "https://picsum.photos/seed/farm_fresh/1200/800";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_logo_final-02.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
-const PICKUP_TIMER_DURATION = 3 * 60; // 3 minutes in seconds
+const PICKUP_TIMER_DURATION = 3 * 60;
 
 export default function OrderStatusPage() {
   const params = useParams();
@@ -36,56 +34,34 @@ export default function OrderStatusPage() {
   );
   
   const { data: order, isLoading } = useDoc<Order>(orderRef);
-
   const [timeLeft, setTimeLeft] = useState(PICKUP_TIMER_DURATION);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const audioPlayed = useRef(false);
 
-  // Security and Navigation Restrictions
   useEffect(() => {
-    // 1. Disable Right-Click
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
-
-    // 2. Prevent Back Navigation
     window.history.pushState(null, "", window.location.href);
-    const handlePopState = () => {
-      window.history.pushState(null, "", window.location.href);
-    };
+    const handlePopState = () => window.history.pushState(null, "", window.location.href);
     window.addEventListener('popstate', handlePopState);
-
-    // 3. Prevent Refresh/Exit Prompt
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "Are you sure you want to refresh? Your tracking session might be interrupted.";
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
   useEffect(() => {
-    if (order?.status === 'Ready') {
-      if (!audioPlayed.current) {
-        const audio = new Audio(BEEP_SOUND_URL);
-        audio.play().catch(e => console.log("Audio play blocked by browser:", e));
-        audioPlayed.current = true;
-      }
+    if (order?.status === 'Ready' && !audioPlayed.current) {
+      new Audio(BEEP_SOUND_URL).play().catch(() => {});
+      audioPlayed.current = true;
     }
-
     if (order?.status === 'Handover') {
       const storageKey = `handover_timer_${orderId}`;
       let endTime = localStorage.getItem(storageKey);
-      
       if (!endTime) {
-        const newEndTime = Date.now() + (PICKUP_TIMER_DURATION * 1000);
-        localStorage.setItem(storageKey, newEndTime.toString());
+        endTime = (Date.now() + (PICKUP_TIMER_DURATION * 1000)).toString();
+        localStorage.setItem(storageKey, endTime);
       }
-      
       setIsTimerActive(true);
     }
   }, [order?.status, orderId]);
@@ -93,25 +69,16 @@ export default function OrderStatusPage() {
   useEffect(() => {
     let interval: any;
     if (isTimerActive) {
-      const storageKey = `handover_timer_${orderId}`;
-      
       const updateTimer = () => {
-        const storedEndTime = localStorage.getItem(storageKey);
+        const storedEndTime = localStorage.getItem(`handover_timer_${orderId}`);
         if (!storedEndTime) return;
-
-        const endTime = parseInt(storedEndTime);
-        const now = Date.now();
-        const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
-        
+        const remaining = Math.max(0, Math.floor((parseInt(storedEndTime) - Date.now()) / 1000));
         setTimeLeft(remaining);
-
         if (remaining <= 0) {
           clearInterval(interval);
-          localStorage.removeItem(storageKey);
           router.push('/thanks');
         }
       };
-
       updateTimer();
       interval = setInterval(updateTimer, 1000);
     }
@@ -120,165 +87,60 @@ export default function OrderStatusPage() {
 
   if (isLoading) return null;
 
-  const getStatusSteps = () => {
-    const status = order?.status || 'Pending';
-    return [
-      { 
-        id: 1, 
-        label: 'Waiting for Approval', 
-        time: 'Order Pending', 
-        completed: ['Received', 'Preparing', 'Served', 'Ready', 'Handover'].includes(status), 
-        active: status === 'Pending', 
-        icon: ShieldAlert 
-      },
-      { 
-        id: 2, 
-        label: 'Order Confirmed', 
-        time: 'Payment Received', 
-        completed: ['Preparing', 'Served', 'Ready', 'Handover'].includes(status), 
-        active: status === 'Received', 
-        icon: CheckCircle2 
-      },
-      { 
-        id: 3, 
-        label: 'Preparing & Quality Check', 
-        time: 'In Kitchen', 
-        completed: ['Ready', 'Handover'].includes(status), 
-        active: ['Preparing', 'Served'].includes(status), 
-        icon: ChefHat 
-      },
-      { 
-        id: 4, 
-        label: 'Final Ready for Pickup', 
-        time: status === 'Ready' ? 'Collect at Counter' : (status === 'Handover' ? 'Handed Over' : 'Pending'), 
-        completed: status === 'Handover', 
-        active: ['Ready', 'Handover'].includes(status), 
-        icon: BellRing 
-      },
-    ];
-  };
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const steps = getStatusSteps();
+  const steps = [
+    { label: 'Waiting for Approval', status: 'Pending', icon: ShieldAlert, active: order?.status === 'Pending', completed: ['Received', 'Preparing', 'Served', 'Ready', 'Handover'].includes(order?.status || '') },
+    { label: 'Harvesting Flavors', status: 'Received', icon: CheckCircle2, active: order?.status === 'Received', completed: ['Preparing', 'Served', 'Ready', 'Handover'].includes(order?.status || '') },
+    { label: 'In Kitchen', status: 'Preparing', icon: ChefHat, active: ['Preparing', 'Served'].includes(order?.status || ''), completed: ['Ready', 'Handover'].includes(order?.status || '') },
+    { label: 'Ready for Collection', status: 'Ready', icon: BellRing, active: ['Ready', 'Handover'].includes(order?.status || ''), completed: order?.status === 'Handover' },
+  ];
 
   return (
-    <div className="min-h-screen bg-background text-white pb-10 overflow-hidden relative">
-      
-      {/* PERSISTENT FLOATING TIMER (Top Left) */}
-      {isTimerActive && (
-        <div className="fixed top-6 left-6 z-[100] animate-in slide-in-from-left-4 duration-500">
-          <div className="bg-primary px-5 py-3 rounded-2xl border-2 border-white/20 shadow-2xl flex items-center gap-3 backdrop-blur-md">
-            <div className="p-2 bg-white/10 rounded-xl">
-              <Clock size={16} className="text-white animate-pulse" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/60">Auto Redirect</span>
-              <span className="text-xl font-black text-white tabular-nums leading-none">{formatTimer(timeLeft)}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="relative h-[40vh] w-full overflow-hidden">
-        <Image 
-          src={HALEEM_HERO} 
-          alt="Dindigul Ananda's Briyani"
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-        
+    <div className="min-h-screen bg-background pb-10 overflow-hidden relative text-primary">
+      <div className="relative h-[35vh] w-full overflow-hidden bg-primary">
+        <Image src={HERO_IMG} alt="Farm Fresh" fill className="object-cover opacity-60" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute top-8 right-6 z-30">
-          <div className="relative p-1 bg-white rounded-full shadow-2xl border-2 border-primary">
-            <Image 
-              src={LOGO_URL} 
-              alt="Dindigul Ananda's Briyani Logo" 
-              width={60} 
-              height={60} 
-              className="rounded-full object-cover"
-            />
+          <div className="relative p-4 bg-white rounded-2xl shadow-2xl border-2 border-accent">
+            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={100} height={43} className="object-contain" />
           </div>
         </div>
       </div>
 
-      <div className="relative -mt-24 px-4 md:px-6 z-20">
-        <div className="bg-primary rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          
-          <div className="mb-10 pb-6 border-b border-white/10 flex justify-between items-end">
+      <div className="relative -mt-20 px-4 md:px-6 z-20">
+        <div className="bg-white rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-2 border-primary/5">
+          <div className="mb-10 pb-6 border-b border-primary/10 flex justify-between items-end">
             <div>
-              <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Takeaway Token</p>
-              <h2 className="text-6xl font-black text-white italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
+              <p className="text-primary/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Order Token</p>
+              <h2 className="text-6xl font-black text-primary italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
             </div>
+            {isTimerActive && (
+              <div className="bg-accent px-4 py-2 rounded-xl text-white font-black tabular-nums">
+                {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+              </div>
+            )}
           </div>
 
           <div className="space-y-10">
             {steps.map((step, idx) => (
-              <div key={step.id} className="relative flex gap-8">
-                
+              <div key={idx} className="relative flex gap-8">
                 {idx !== steps.length - 1 && (
-                  <div className={cn(
-                    "absolute left-[21px] top-12 w-[2px] h-10 transition-colors duration-500",
-                    step.completed ? "bg-white" : "bg-white/10"
-                  )} />
+                  <div className={cn("absolute left-[21px] top-12 w-[2px] h-10 transition-colors duration-500", step.completed ? "bg-accent" : "bg-primary/10")} />
                 )}
-
-                <div className={cn(
-                  "relative z-10 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-700",
-                  step.completed || step.active 
-                    ? "bg-transparent border-white text-white" 
-                    : "bg-transparent border-white/10 text-white/10"
-                )}>
-                  {step.completed && !step.active ? (
-                    <CheckCircle2 size={20} />
-                  ) : (
-                    <step.icon 
-                      size={20} 
-                      strokeWidth={step.active ? 3 : 2} 
-                      className={cn(step.active && "animate-pulse")}
-                    />
-                  )}
+                <div className={cn("relative z-10 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-700", step.completed || step.active ? "bg-accent border-accent text-white" : "bg-white border-primary/10 text-primary/10")}>
+                  <step.icon size={20} className={cn(step.active && "animate-pulse")} />
                 </div>
-
                 <div className="flex flex-col justify-center">
-                  <h3 className={cn(
-                    "font-black text-lg uppercase tracking-tight italic leading-none",
-                    step.completed || step.active ? "text-white" : "text-white/20"
-                  )}>
-                    {step.label}
-                  </h3>
-                  <p className={cn(
-                    "text-[9px] font-bold uppercase tracking-widest mt-1.5",
-                    step.completed || step.active ? "text-white/40" : "text-white/10"
-                  )}>
-                    {step.time}
-                  </p>
+                  <h3 className={cn("font-black text-lg uppercase tracking-tight italic leading-none", step.completed || step.active ? "text-primary" : "text-primary/20")}>{step.label}</h3>
+                  <p className="text-[9px] font-bold uppercase tracking-widest mt-1.5 text-primary/40">Vaaradhi Farms Authentic</p>
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="mt-14 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
-             <div className="flex items-center gap-3">
-                <Star size={10} className="text-white/20 fill-white/20" />
-                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">Dindigul Ananda's Briyani</p>
-                <Star size={10} className="text-white/20 fill-white/20" />
-             </div>
-          </div>
         </div>
       </div>
 
-      <footer className="mt-12 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
-            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20">Powered by</span>
-            <span className="text-white font-black text-lg tracking-tighter leading-none">GetPik</span>
-        </div>
+      <footer className="mt-12 flex flex-col items-center gap-3 opacity-40">
+        <p className="text-[8px] font-black uppercase tracking-[0.3em]">Vaaradhi Farms • Authentic Dining</p>
       </footer>
     </div>
   );

@@ -1,99 +1,83 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useFirestore } from "@/firebase";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import Image from 'next/image';
-import { Armchair, Loader2, ShoppingBag } from "lucide-react";
-import { Table as TableType } from "@/lib/types";
+import { ShoppingBag, Utensils, ArrowRight } from "lucide-react";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_logo_final-02.webp?alt=media&token=648ab03a-a11d-4d9e-9614-b4408da79a4c";
 
 export default function TableSelection() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const [tables, setTables] = useState<TableType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!firestore) return;
-    const q = query(collection(firestore, 'tables'), orderBy('tableNumber'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setTables(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TableType)));
-      setIsLoading(false);
-    }, () => setIsLoading(false));
-    return () => unsubscribe();
-  }, [firestore]);
-
-  const handleSelect = (id: string) => {
-    router.push(`/?table=${id}`);
+  const handleSelect = (mode: string) => {
+    router.push(`/?table=${mode}`);
   };
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-primary">
-        <Loader2 className="h-12 w-12 text-white animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
+      {/* Background patterns */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] bg-[length:40px_40px]" />
+      </div>
+
       <div className="w-full max-w-2xl space-y-12 text-center relative z-20">
         
-        <div className="relative flex justify-center flex-col items-center gap-4">
-          <div className="relative bg-white p-3 rounded-full shadow-2xl border-4 border-white/30">
+        <div className="relative flex justify-center flex-col items-center gap-6">
+          <div className="relative bg-white px-8 py-4 rounded-[2rem] shadow-2xl border-4 border-accent/20 animate-in zoom-in duration-700">
             <Image 
               src={LOGO_URL} 
-              alt="Dindigul Ananda's Briyani Logo" 
-              width={100} 
-              height={100}
-              className="rounded-full object-cover" 
+              alt="Vaaradhi Farms Logo" 
+              width={200} 
+              height={86}
+              className="object-contain" 
               priority
             />
           </div>
-          <h1 className="text-3xl font-black italic text-white leading-[1.1] uppercase tracking-tighter drop-shadow-xl">
-            Welcome to Dindigul Ananda's Briyani
-          </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/80">
-            Please select your table to begin
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black italic text-white leading-[1.1] uppercase tracking-tighter drop-shadow-xl">
+              Welcome to <span className="text-accent">Vaaradhi Farms</span>
+            </h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/60">
+              Select your dining preference
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in slide-in-from-bottom-8 duration-1000">
+          <button 
+            onClick={() => handleSelect('DineIn')}
+            className="group relative flex flex-col items-center justify-center gap-6 p-10 bg-white/10 hover:bg-white rounded-[3rem] border-2 border-white/20 hover:border-accent transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+          >
+            <div className="p-6 bg-accent rounded-3xl group-hover:bg-primary transition-colors duration-500">
+              <Utensils size={48} className="text-white" />
+            </div>
+            <div className="text-center">
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors">Dine-In</h2>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-white/40 group-hover:text-primary/40 mt-1">Enjoy at our farm</p>
+            </div>
+            <ArrowRight className="absolute bottom-8 right-8 text-accent opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2" />
+          </button>
+
+          <button 
+            onClick={() => handleSelect('Takeaway')}
+            className="group relative flex flex-col items-center justify-center gap-6 p-10 bg-white/10 hover:bg-white rounded-[3rem] border-2 border-white/20 hover:border-accent transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+          >
+            <div className="p-6 bg-accent rounded-3xl group-hover:bg-primary transition-colors duration-500">
+              <ShoppingBag size={48} className="text-white" />
+            </div>
+            <div className="text-center">
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors">Takeaway</h2>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-white/40 group-hover:text-primary/40 mt-1">Ready for pickup</p>
+            </div>
+            <ArrowRight className="absolute bottom-8 right-8 text-accent opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2" />
+          </button>
+        </div>
+
+        <div className="pt-8">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+            Freshness Guaranteed • Vaaradhi Farms
           </p>
         </div>
-
-        <div className="bg-white/10 border border-white/20 rounded-[2.5rem] p-8 backdrop-blur-md">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 mb-6">Dine-In Tables</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-            {tables.map((table) => (
-                <button
-                key={table.id}
-                onClick={() => handleSelect(table.id)}
-                className="flex flex-col items-center justify-center gap-2 aspect-square rounded-2xl text-lg font-black italic bg-black/20 text-white border border-white/20 transition-all duration-300 hover:bg-white hover:text-primary hover:scale-105 active:scale-95 shadow-lg"
-                >
-                <Armchair size={24} />
-                <span className="text-sm">{table.tableNumber}</span>
-                </button>
-            ))}
-            </div>
-        </div>
-
-        <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-dashed border-white/20"/>
-            </div>
-            <div className="relative flex justify-center">
-                <span className="bg-primary px-4 text-xs font-bold uppercase text-white/60">OR</span>
-            </div>
-        </div>
-
-        <button 
-          onClick={() => handleSelect('Takeaway')}
-          className="w-full max-w-sm mx-auto flex items-center justify-center gap-4 bg-white text-primary p-6 rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl hover:scale-105 transition-transform active:scale-95"
-        >
-          <ShoppingBag size={20}/>
-          Place a Takeaway Order
-        </button>
-
       </div>
     </div>
   );
