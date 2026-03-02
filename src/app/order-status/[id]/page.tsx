@@ -119,25 +119,25 @@ export default function OrderStatusPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20 overflow-hidden relative text-white selection:bg-white/20">
+      {/* FIXED LOGO PLACEMENT: TOP RIGHT */}
+      <div className="fixed top-8 right-8 z-50">
+        <div className="bg-white px-6 py-2 rounded-2xl shadow-xl border-4 border-white/20 transform hover:scale-105 transition-all duration-700">
+          <Image src={LOGO_URL} alt="Vaaradhi Farms" width={100} height={43} className="object-contain" priority />
+        </div>
+      </div>
+
       {/* Background Layer - Clean & Subtle */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-[40vh] bg-white/5 opacity-20" />
         <div className="absolute bottom-0 right-0 w-[60%] h-[60%] bg-white/5 blur-[80px] rounded-full translate-x-1/3 translate-y-1/3 opacity-30" />
       </div>
 
-      {/* Dynamic Animated Header */}
-      <div className="relative h-[45vh] w-full overflow-hidden bg-primary/5 flex flex-col items-center justify-center">
+      {/* Dynamic Animated Header - Increased height to accommodate lower character positioning */}
+      <div className="relative h-[55vh] w-full overflow-hidden bg-primary/5 flex flex-col items-center justify-end">
         <StatusVisualizer status={order?.status || 'Pending'} />
-        
-        {/* LOGO PLACEMENT: TOP RIGHT */}
-        <div className="absolute top-8 right-8 z-30">
-          <div className="bg-white px-6 py-2 rounded-2xl shadow-xl border-4 border-white/20 transform hover:scale-105 transition-all duration-700">
-            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={100} height={43} className="object-contain" />
-          </div>
-        </div>
       </div>
 
-      <div className="relative -mt-16 px-6 z-20 max-w-lg mx-auto">
+      <div className="relative -mt-12 px-6 z-20 max-w-lg mx-auto">
         {/* Play Game Button */}
         {['Received', 'Preparing', 'Served'].includes(order?.status || '') && (
           <div className="mb-8 flex justify-center animate-in slide-in-from-top-10 duration-1000">

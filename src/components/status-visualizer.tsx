@@ -11,19 +11,28 @@ export function StatusVisualizer({ status }: { status: Status }) {
   const isPending = status === 'Pending';
   // Character wakes up and cooks when order is Received, Preparing, or Served
   const isPreparing = ['Received', 'Preparing', 'Served'].includes(status);
-  // Character is ready when status is Ready, Handover, or Completed
-  const isReady = ['Ready', 'Handover', 'Completed'].includes(status);
+  // Character is ready when status is Ready
+  const isReady = status === 'Ready';
+  // Character runs sideways to deliver when status is Handover or Completed
+  const isHandover = ['Handover', 'Completed'].includes(status);
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
-      <div className="relative z-10 w-full max-w-4xl h-80 flex flex-col items-center justify-center">
+    <div className="relative w-full h-full flex flex-col items-center justify-end pb-12 overflow-hidden">
+      <div className="relative z-10 w-full max-w-4xl h-80 flex flex-col items-center justify-end">
         
         {/* CHARACTER ILLUSTRATION */}
-        <div className={cn("relative transition-all duration-1000", isPreparing && "animate-bounce")}>
-          {/* Subtle Glow (Reduced from previous) */}
+        <div className={cn(
+          "relative transition-all duration-1000", 
+          isPreparing && "animate-bounce",
+          isHandover && "animate-slide-in translate-x-[-20px]" // Subtle forward lean for running
+        )}>
+          {/* Subtle Glow */}
           <div className="absolute -inset-10 bg-white/5 blur-[60px] rounded-full" />
           
-          <svg viewBox="0 0 200 200" className="w-64 h-64 drop-shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+          <svg viewBox="0 0 200 200" className={cn(
+            "w-64 h-64 drop-shadow-[0_10px_30px_rgba(0,0,0,0.2)]",
+            isHandover && "animate-sway" // Running/Waddling effect
+          )}>
             {/* Chef Hat */}
             <path d="M80 45 Q 100 15 120 45" fill="white" stroke="white" strokeWidth="2" />
             
@@ -39,20 +48,12 @@ export function StatusVisualizer({ status }: { status: Status }) {
               </g>
             )}
             
-            {isPreparing && (
+            {(isPreparing || isReady || isHandover) && (
               <g>
                 {/* Waking Up / Joyful Eyes */}
                 <circle cx="88" cy="70" r="3" fill="#f38221" />
                 <circle cx="112" cy="70" r="3" fill="#f38221" />
                 <path d="M90 85 Q 100 95 110 85" stroke="#f38221" strokeWidth="2" fill="none" strokeLinecap="round" />
-              </g>
-            )}
-            
-            {isReady && (
-              <g>
-                <path d="M85 68 Q 88 65 91 68" stroke="#f38221" strokeWidth="2" fill="none" />
-                <path d="M109 68 Q 112 65 115 68" stroke="#f38221" strokeWidth="2" fill="none" />
-                <path d="M85 82 Q 100 100 115 82" fill="#f38221" />
               </g>
             )}
 
@@ -75,7 +76,6 @@ export function StatusVisualizer({ status }: { status: Status }) {
                   <rect x="40" y="110" width="30" height="10" rx="5" fill="white" />
                   <rect x="130" y="110" width="30" height="10" rx="5" fill="white" />
                 </g>
-                {/* Floating Joyful Hearts */}
                 <g className="text-white/40">
                    <path d="M150 50 Q 155 40 160 50 T 170 50" fill="white" className="animate-steam" style={{ animationDelay: '0.2s' }} />
                    <path d="M40 60 Q 45 50 50 60 T 60 60" fill="white" className="animate-steam" style={{ animationDelay: '0.8s' }} />
@@ -84,7 +84,7 @@ export function StatusVisualizer({ status }: { status: Status }) {
             )}
 
             {/* Step 3: Ready and Smiling with Bag */}
-            {isReady && (
+            {(isReady || isHandover) && (
               <g>
                 <circle cx="150" cy="140" r="40" fill="white" opacity="0.05" className="animate-pulse" />
                 <g className="animate-float" style={{ transform: 'translate(40px, 40px)' }}>
@@ -94,11 +94,26 @@ export function StatusVisualizer({ status }: { status: Status }) {
                 </g>
               </g>
             )}
+
+            {/* Running Legs for Handover */}
+            {isHandover && (
+              <g fill="white">
+                <rect x="80" y="160" width="8" height="20" rx="4" className="animate-sway" />
+                <rect x="112" y="160" width="8" height="20" rx="4" className="animate-sway" style={{ animationDelay: '0.5s' }} />
+              </g>
+            )}
           </svg>
+
+          {/* Heart for Handover */}
+          {isHandover && (
+            <div className="absolute top-0 right-0 animate-bounce">
+              <Heart size={32} className="text-white fill-white" />
+            </div>
+          )}
         </div>
 
         {/* STATUS LABEL */}
-        <div className="mt-10 flex flex-col items-center gap-3">
+        <div className="mt-6 flex flex-col items-center gap-3">
           <div className="flex items-center gap-3 bg-white/5 px-8 py-4 rounded-[2rem] border border-white/10 backdrop-blur-md">
             {isPending && (
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
@@ -118,6 +133,14 @@ export function StatusVisualizer({ status }: { status: Status }) {
                 <Sparkles size={16} className="text-amber-300 animate-pulse" />
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
                   The Harvest is Ready!
+                </span>
+              </div>
+            )}
+            {isHandover && (
+              <div className="flex items-center gap-3">
+                <Heart size={16} className="text-rose-400 fill-rose-400 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
+                  Handing over with Love
                 </span>
               </div>
             )}
