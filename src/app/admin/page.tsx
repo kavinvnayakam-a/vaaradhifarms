@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -38,6 +37,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { GetPikLogo } from "@/components/getpik-logo";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -125,10 +125,13 @@ export default function AdminDashboard() {
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="p-4 border-t border-white/10">
-            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full px-4 py-6">
+          <SidebarFooter className="p-6 border-t border-white/10 flex flex-col gap-8">
+            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full">
               <LogOut className="w-4 h-4" /> <span>Sign Out</span>
             </button>
+            <div className="mt-2">
+              <GetPikLogo variant="opacity" />
+            </div>
           </SidebarFooter>
         </Sidebar>
 

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Heart, Star, ArrowRight } from "lucide-react";
 import Link from 'next/link';
 import Image from 'next/image';
+import { GetPikLogo } from '@/components/getpik-logo';
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -46,7 +47,7 @@ export default function ThankYouPage() {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-black italic text-white leading-[1.1] uppercase tracking-tighter drop-shadow-2xl">
-            Purely <br /> <span className="text-primary">Authentic.</span>
+            Purely <br /> <span className="text-white/20">Authentic.</span>
           </h1>
           <p className="text-white/40 text-[10px] font-bold italic tracking-widest uppercase">
             We hope you enjoyed the flavors of our farm.
@@ -66,13 +67,13 @@ export default function ThankYouPage() {
           <p className="font-black italic uppercase text-2xl mb-1 tracking-tighter">Loved the taste?</p>
           <p className="text-[10px] text-white/40 mb-8 font-black uppercase tracking-widest">Rate your experience on Google</p>
           
-          <div className="inline-flex items-center gap-3 bg-white text-background font-black text-[12px] uppercase tracking-[0.4em] px-10 py-5 rounded-full group-hover:bg-primary group-hover:text-white transition-all shadow-2xl">
+          <div className="inline-flex items-center gap-3 bg-white text-background font-black text-[12px] uppercase tracking-[0.4em] px-10 py-5 rounded-full group-hover:bg-[#f38221] group-hover:text-white transition-all shadow-2xl">
             Open Maps <ArrowRight size={16} />
           </div>
         </Link>
 
-        <Link href="https://www.getpik.in/pos" target="_blank" className="flex flex-col items-center gap-3 group mt-12 opacity-40 hover:opacity-100 transition-opacity">
-          <span className="text-[8px] font-black uppercase tracking-[0.6em] text-white">Digital Connect By GetPik</span>
+        <Link href="https://www.getpik.in/pos" target="_blank" className="block mt-12">
+          <GetPikLogo variant="opacity" />
         </Link>
       </div>
     </div>

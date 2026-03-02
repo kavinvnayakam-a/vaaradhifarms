@@ -11,6 +11,7 @@ import { CartIcon } from '@/components/cart-icon';
 import type { MenuItem } from '@/lib/types';
 import { ArrowUp, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { GetPikLogo } from '@/components/getpik-logo';
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
   const { addToCart } = useCart();
@@ -211,9 +212,8 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                 <p className="text-[11px] sm:text-[12px] font-black uppercase tracking-[0.8em] sm:tracking-[1em] text-white/60">The Boutique Farm Experience</p>
                 <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto" />
              </div>
-             <div className="flex flex-col items-center gap-4 opacity-30">
-                <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white">Digital Architecture By GetPik</p>
-             </div>
+             
+             <GetPikLogo variant="opacity" className="mt-8" />
           </div>
         </div>
       </footer>
