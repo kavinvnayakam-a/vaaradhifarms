@@ -27,20 +27,20 @@ export function StatusVisualizer({ status }: { status: Status }) {
       {/* 3D-STYLED CHARACTER WORKSPACE */}
       <div className="relative flex flex-col items-center">
         
-        {/* iOS-STYLE MESSAGE BUBBLE - Refined Placement & Size */}
+        {/* iOS-STYLE MESSAGE BUBBLE - Positioned to the Right of the Head */}
         <div 
           key={status} // Key ensures re-animation on status change
           className={cn(
-            "absolute -top-20 left-1/2 -translate-x-1/2 z-30",
-            "animate-in zoom-in-95 fade-in slide-in-from-bottom-4 duration-500 ease-out"
+            "absolute top-4 left-[65%] z-30 min-w-max",
+            "animate-in zoom-in-95 fade-in slide-in-from-left-4 duration-500 ease-out"
           )}
         >
           <div className="relative bg-white text-zinc-900 px-4 py-2 rounded-2xl shadow-xl border border-white/50 backdrop-blur-md">
             <p className="font-bold text-[10px] leading-tight text-center whitespace-nowrap tracking-tight">
               {getCalloutText()}
             </p>
-            {/* iOS Message Tail */}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45" 
+            {/* iOS Message Tail - Adjusted for side placement */}
+            <div className="absolute -bottom-1 left-4 w-3 h-3 bg-white rotate-45" 
                  style={{ clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)' }} />
           </div>
         </div>
