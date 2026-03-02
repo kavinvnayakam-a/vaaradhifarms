@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -92,8 +93,9 @@ export default function AdminDashboard() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-white text-zinc-900 font-sans">
-        <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10">
+      <div className="flex h-screen w-full bg-white text-zinc-900 font-sans relative overflow-hidden">
+        {/* Sidebar - Desktop Only behavior */}
+        <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10 hidden md:flex">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center">
             <div className="bg-white px-4 py-2 rounded-xl shadow-xl">
               <Image src={LOGO_URL} alt="Vaaradhi Farms" width={120} height={52} className="object-contain" />
@@ -125,7 +127,7 @@ export default function AdminDashboard() {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="p-6 border-t border-white/10 flex flex-col gap-8">
-            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full">
+            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full text-left">
               <LogOut className="w-4 h-4" /> <span>Sign Out</span>
             </button>
             <div className="mt-2">
@@ -135,22 +137,25 @@ export default function AdminDashboard() {
         </Sidebar>
 
         <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white">
-          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100 px-8 py-6 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-6">
-              <SidebarTrigger className="text-zinc-400 hover:text-background transition-colors"><PanelLeft size={24} /></SidebarTrigger>
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter text-zinc-900">
+          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100 px-4 md:px-8 py-4 md:py-6 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3 md:gap-6">
+              <SidebarTrigger className="text-zinc-400 hover:text-background transition-colors shrink-0">
+                <PanelLeft className="w-5 h-5 md:w-6 md:h-6" />
+              </SidebarTrigger>
+              <h2 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter text-zinc-900 truncate">
                 {activeTab.replace('_', ' ')}
               </h2>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="px-5 py-3 bg-background/5 rounded-2xl flex items-center gap-3 border border-background/10">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-background">System Live</span>
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="px-3 md:px-5 py-2 md:py-3 bg-background/5 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-3 border border-background/10">
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-background whitespace-nowrap">System Live</span>
               </div>
             </div>
           </header>
-          <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            <div className="max-w-7xl mx-auto pb-20 text-zinc-900">
+
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div className="max-w-7xl mx-auto pb-24 md:pb-20 text-zinc-900">
               {activeTab === 'counter' && <OrderManager />}
               {activeTab === 'packing' && <KotView />}
               {activeTab === 'today_orders' && <TodayOrders />}
@@ -160,6 +165,32 @@ export default function AdminDashboard() {
               {activeTab === 'settings' && <SettingsManager />}
             </div>
           </main>
+
+          {/* Mobile Bottom Navigation */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-[50] bg-white border-t border-zinc-100 flex items-center justify-around h-20 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="flex w-full overflow-x-auto no-scrollbar snap-x px-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }}
+                  className={cn(
+                    "flex-shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[64px] snap-center transition-all duration-300",
+                    activeTab === item.id ? "text-background scale-110" : "text-zinc-300"
+                  )}
+                >
+                  <div className="relative">
+                    <item.icon className={cn("w-5 h-5", activeTab === item.id ? "stroke-[3px]" : "stroke-[2px]")} />
+                    {item.showBadge && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-background rounded-full animate-pulse border-2 border-white" />
+                    )}
+                  </div>
+                  <span className="text-[7px] font-black uppercase tracking-widest text-center truncate w-full px-1">
+                    {item.label.includes(' ') ? item.label.split(' ')[0] : item.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </SidebarProvider>
