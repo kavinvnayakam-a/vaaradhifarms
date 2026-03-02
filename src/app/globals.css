@@ -66,20 +66,15 @@
   100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
 }
 
-@keyframes conveyor {
-  from { background-position: 0 0; }
-  to { background-position: 100px 0; }
+@keyframes zzz {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(20px, -40px) scale(1.2); opacity: 0; }
 }
 
-@keyframes item-move {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(500%); }
-}
-
-@keyframes sprout {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes chop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
 }
 
 .animate-float {
@@ -94,18 +89,12 @@
   animation: steam 2s ease-in-out infinite;
 }
 
-.animate-conveyor {
-  background-image: linear-gradient(90deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
-  background-size: 40px 100%;
-  animation: conveyor 1s linear infinite;
+.animate-zzz {
+  animation: zzz 3s ease-in-out infinite;
 }
 
-.animate-item-move {
-  animation: item-move 4s linear infinite;
-}
-
-.animate-sprout {
-  animation: sprout 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+.animate-chop {
+  animation: chop 0.5s ease-in-out infinite;
 }
 
 @media print {

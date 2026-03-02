@@ -8,11 +8,9 @@ import { doc } from 'firebase/firestore';
 import { 
   CheckCircle2, 
   ChefHat, 
-  Star,
   ShieldAlert,
   BellRing,
   Clock,
-  ArrowLeft,
   Gamepad2,
   Sparkles
 } from 'lucide-react';
@@ -44,15 +42,31 @@ export default function OrderStatusPage() {
   const [showGame, setShowGame] = useState(false);
   const audioPlayed = useRef(false);
 
+  // STRICT NAVIGATION PROTECTION
   useEffect(() => {
+    // 1. Prevent Right Click
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
+
+    // 2. Prevent Back Navigation
     window.history.pushState(null, "", window.location.href);
-    const handlePopState = () => window.history.pushState(null, "", window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, "", window.location.href);
+      alert("Navigation is restricted while your order is in progress.");
+    };
     window.addEventListener('popstate', handlePopState);
+
+    // 3. Warn on Refresh/Close
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure you want to leave? Your order tracking will be lost.";
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
@@ -115,13 +129,14 @@ export default function OrderStatusPage() {
       </div>
 
       {/* Dynamic Animated Header */}
-      <div className="relative h-[45vh] w-full overflow-hidden bg-primary/20 flex flex-col items-center justify-center">
+      <div className="relative h-[50vh] w-full overflow-hidden bg-primary/10 flex flex-col items-center justify-center">
         <StatusVisualizer status={order?.status || 'Pending'} />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/5 to-transparent" />
         
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30">
-          <div className="bg-white px-8 py-3 rounded-2xl shadow-2xl border-4 border-white/30 transform hover:scale-105 transition-all duration-700">
-            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={140} height={60} className="object-contain" />
+        {/* LOGO PLACEMENT: TOP RIGHT */}
+        <div className="absolute top-8 right-8 z-30">
+          <div className="bg-white px-6 py-2 rounded-2xl shadow-2xl border-4 border-white/30 transform hover:scale-105 transition-all duration-700">
+            <Image src={LOGO_URL} alt="Vaaradhi Farms" width={100} height={43} className="object-contain" />
           </div>
         </div>
       </div>
