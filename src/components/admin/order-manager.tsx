@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -71,9 +70,10 @@ export default function OrderManager() {
 
   const totals = useMemo(() => {
     const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const total = Math.round(subtotal * 1.05);
-    return { subtotal, total };
-  }, [selectedItems]);
+    const packagingCharge = manualOrderTableId === 'Takeaway' ? 20 : 0;
+    const total = Math.round(subtotal * 1.05 + packagingCharge);
+    return { subtotal, total, packagingCharge };
+  }, [selectedItems, manualOrderTableId]);
 
   const confirmOrder = async (order: Order) => {
     if (!firestore) return;
@@ -106,6 +106,10 @@ export default function OrderManager() {
         customerPhone: customerPhone || "N/A",
         paymentMethod,
         items: selectedItems,
+        subtotal: totals.subtotal,
+        cgst: totals.subtotal * 0.025,
+        sgst: totals.subtotal * 0.025,
+        packagingCharge: totals.packagingCharge,
         totalPrice: totals.total,
         status: 'Received',
         timestamp: serverTimestamp(),
@@ -172,6 +176,12 @@ export default function OrderManager() {
                   <span className="text-zinc-300">₹{item.price * item.quantity}</span>
                 </div>
               ))}
+              {order.packagingCharge ? (
+                <div className="flex justify-between text-[11px] font-bold text-amber-600 uppercase italic">
+                  <span>Packaging Charge</span>
+                  <span>₹{order.packagingCharge}</span>
+                </div>
+              ) : null}
             </div>
 
             <div className="pt-6 border-t-2 border-dashed border-zinc-100 mb-8 flex justify-between items-end">
@@ -288,6 +298,15 @@ export default function OrderManager() {
                           </div>
                         </div>
                       ))}
+                      {totals.packagingCharge > 0 && (
+                        <div className="flex justify-between items-center p-3 bg-amber-50 rounded-xl shadow-sm border border-amber-100">
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-amber-900 uppercase italic">Packaging Charge</span>
+                            <span className="text-[9px] font-bold text-amber-400 uppercase">Takeaway Default</span>
+                          </div>
+                          <span className="text-sm font-black text-amber-600">₹20</span>
+                        </div>
+                      )}
                       {selectedItems.length === 0 && <p className="text-[10px] text-zinc-300 text-center py-10 uppercase font-bold italic">No items selected</p>}
                     </div>
                   </ScrollArea>

@@ -25,6 +25,7 @@ export interface Order {
   subtotal?: number;
   cgst?: number;
   sgst?: number;
+  packagingCharge?: number;
   cashReceived?: number | null;
   changeDue?: number | null;
   status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Handover' | 'Completed';

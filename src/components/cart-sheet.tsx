@@ -33,7 +33,8 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
   const subtotal = cartTotal;
   const cgst = subtotal * 0.025;
   const sgst = subtotal * 0.025;
-  const grandTotal = Math.round(subtotal + cgst + sgst);
+  const packagingCharge = tableId === 'Takeaway' ? 20 : 0;
+  const grandTotal = Math.round(subtotal + cgst + sgst + packagingCharge);
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -86,6 +87,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         subtotal: subtotal,
         cgst: cgst,
         sgst: sgst,
+        packagingCharge: packagingCharge,
         totalPrice: grandTotal,
         status: 'Pending',
         timestamp: serverTimestamp(),
@@ -191,6 +193,12 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                     <span>Taxes (GST 5%)</span>
                     <span className="text-zinc-600">{formatCurrency(cgst + sgst)}</span>
                   </div>
+                  {packagingCharge > 0 && (
+                    <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-amber-600">
+                      <span>Packaging Charge</span>
+                      <span>{formatCurrency(packagingCharge)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-end">
