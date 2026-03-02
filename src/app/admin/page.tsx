@@ -9,6 +9,7 @@ import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
 import TodayOrders from "@/components/admin/today-orders";
 import SettingsManager from "@/components/admin/settings-manager";
+import MenuAIImporter from "@/components/admin/menu-ai-importer";
 import { useFirestore } from "@/firebase";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -23,6 +24,7 @@ import {
   LayoutList,
   Loader2,
   UtensilsCrossed,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -41,7 +43,7 @@ import { GetPikLogo } from "@/components/getpik-logo";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
-type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'analytics' | 'settings';
+type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'ai_importer' | 'analytics' | 'settings';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -83,6 +85,7 @@ export default function AdminDashboard() {
     { id: 'today_orders', label: "Today's Orders", icon: LayoutList },
     { id: 'history', label: 'Order Archives', icon: Clock },
     { id: 'menu', label: 'Menu Config', icon: UtensilsCrossed },
+    { id: 'ai_importer', label: 'AI Importer', icon: Sparkles },
     { id: 'analytics', label: 'Business', icon: TrendingUp },
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
@@ -158,6 +161,7 @@ export default function AdminDashboard() {
               {activeTab === 'today_orders' && <TodayOrders />}
               {activeTab === 'history' && <OrderHistory />}
               {activeTab === 'menu' && <MenuManager />}
+              {activeTab === 'ai_importer' && <MenuAIImporter />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
               {activeTab === 'settings' && <SettingsManager />}
             </div>
