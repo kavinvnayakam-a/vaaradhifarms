@@ -17,15 +17,14 @@ export function GetPikLogo({ className, variant = 'light' }: GetPikLogoProps) {
       <div className="flex items-center gap-1.5">
         <span className={cn(
           "font-black text-xl tracking-tighter uppercase italic transition-colors",
-          variant === 'light' ? "text-white" : variant === 'dark' ? "text-zinc-900" : "text-white"
+          "text-white"
         )}>
-          Get<span className="text-zinc-400 group-hover:text-white transition-colors">Pik</span>
+          Get<span className="text-white transition-colors">Pik</span>
         </span>
-        <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse shadow-[0_0_8px_rgba(161,161,170,0.6)]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
       </div>
       <p className={cn(
-        "text-[7px] font-black uppercase tracking-[0.4em] transition-opacity",
-        variant === 'light' ? "text-white/40" : variant === 'dark' ? "text-zinc-400" : "text-white/40"
+        "text-[7px] font-black uppercase tracking-[0.4em] transition-opacity text-white/40"
       )}>
         Digital Architecture
       </p>
