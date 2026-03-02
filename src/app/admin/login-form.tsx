@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react";
@@ -102,12 +101,12 @@ export default function LoginForm() {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Administrator Email</Label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white transition-colors w-4 h-4" />
-                  <Input 
+                  <input 
                     type="email" 
                     placeholder="admin@getpik.in" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2" 
+                    className="w-full pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2 outline-none" 
                     required 
                   />
                 </div>
@@ -117,12 +116,12 @@ export default function LoginForm() {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Security Key</Label>
                 <div className="relative group">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white transition-colors w-4 h-4" />
-                  <Input 
+                  <input 
                     type="password" 
                     placeholder="••••••••" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2" 
+                    className="w-full pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2 outline-none" 
                     required 
                   />
                 </div>
