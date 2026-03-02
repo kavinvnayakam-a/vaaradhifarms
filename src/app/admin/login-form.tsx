@@ -1,17 +1,19 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Unlock, Mail, Lock, ShieldCheck, Box } from "lucide-react";
+import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/firebase";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import Image from "next/image";
+import { GetPikLogo } from "@/components/getpik-logo";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -34,7 +36,12 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    const allowedEmails = ["info@getpik.in", "admin@vaaradhifarms.com", "murugananthands@gmail.com"];
+    const allowedEmails = [
+      "info@getpik.in", 
+      "admin@vaaradhifarms.com", 
+      "murugananthands@gmail.com",
+      "admin@getpik.in"
+    ];
     
     setTimeout(() => {
       if (allowedEmails.includes(email.toLowerCase().trim()) && password.length >= 4) {
@@ -87,7 +94,7 @@ export default function LoginForm() {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white transition-colors w-4 h-4" />
                   <Input 
                     type="email" 
-                    placeholder="admin@vaaradhifarms.com" 
+                    placeholder="admin@getpik.in" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all" 
@@ -137,8 +144,8 @@ export default function LoginForm() {
           </CardContent>
         </Card>
         
-        <div className="flex flex-col items-center gap-4 opacity-30 animate-pulse">
-           <p className="text-white text-[10px] font-black uppercase tracking-[1em]">GetPik Digital</p>
+        <div className="flex flex-col items-center gap-4">
+           <GetPikLogo variant="opacity" />
         </div>
       </div>
     </div>

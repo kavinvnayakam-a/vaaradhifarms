@@ -36,7 +36,12 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    const allowedEmails = ["info@getpik.in", "admin@vaaradhifarms.com", "murugananthands@gmail.com"];
+    const allowedEmails = [
+      "info@getpik.in", 
+      "admin@vaaradhifarms.com", 
+      "murugananthands@gmail.com",
+      "admin@getpik.in"
+    ];
     
     setTimeout(() => {
       if (allowedEmails.includes(email.toLowerCase().trim()) && password.length >= 4) {
@@ -99,7 +104,7 @@ export default function LoginForm() {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-white transition-colors w-4 h-4" />
                   <Input 
                     type="email" 
-                    placeholder="admin@vaaradhifarms.com" 
+                    placeholder="admin@getpik.in" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2" 
