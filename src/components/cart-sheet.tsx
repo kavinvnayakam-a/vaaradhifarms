@@ -31,14 +31,11 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const firestore = useFirestore();
 
-  // GST Calculations
   const subtotal = cartTotal;
   const cgst = subtotal * 0.025;
   const sgst = subtotal * 0.025;
-  // Round the grand total to the nearest whole number
   const grandTotal = Math.round(subtotal + cgst + sgst);
 
-  // Checkout Form State
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'UPI'>('UPI');
@@ -120,79 +117,79 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetContent 
           side="right" 
-          className="flex flex-col bg-card border-l border-white/20 w-[90vw] sm:max-w-md p-0 overflow-hidden"
+          className="flex flex-col bg-white border-l border-white/20 w-[95vw] sm:max-w-md p-0 overflow-hidden"
         >
-          <SheetHeader className="p-8 border-b border-white/10 bg-black/10 backdrop-blur-md">
-            <SheetTitle className="text-2xl font-bold text-card-foreground flex items-center justify-between">
+          <SheetHeader className="p-10 border-b border-zinc-100 bg-zinc-50/50">
+            <SheetTitle className="text-2xl font-bold text-background flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-card-foreground/60 mb-1">Your Selection</span>
-                <span className="font-black italic uppercase text-card-foreground/90">{tableId || 'Takeaway Order'}</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-zinc-300 mb-2">My Selections</span>
+                <span className="font-black italic uppercase text-background text-3xl tracking-tighter">{tableId === 'Takeaway' ? 'Takeaway' : 'Dine-In'}</span>
               </div>
-              <div className="bg-white/10 p-4 rounded-2xl border border-white/20">
-                <ShoppingBag className="text-card-foreground h-6 w-6" />
+              <div className="bg-background text-white p-5 rounded-3xl shadow-xl">
+                <ShoppingBag className="h-7 w-7" />
               </div>
             </SheetTitle>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="flex-1 overflow-y-auto px-8 py-10">
             {cartItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full space-y-6">
-                <div className="w-24 h-24 bg-black/10 rounded-full flex items-center justify-center mb-2 border border-white/10">
-                  <ShoppingBag size={40} className="text-card-foreground/10" />
+              <div className="flex flex-col items-center justify-center h-full space-y-8">
+                <div className="w-32 h-32 bg-zinc-50 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-inner">
+                  <ShoppingBag size={48} className="text-zinc-200" />
                 </div>
-                <p className="text-card-foreground/20 font-black uppercase tracking-[0.4em] text-[10px]">Your tray is empty</p>
+                <p className="text-zinc-300 font-black uppercase tracking-[0.5em] text-[11px]">Your tray is empty</p>
               </div>
             ) : (
-              <div className="space-y-8 pt-4">
+              <div className="space-y-10">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-start gap-5 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="relative h-20 w-20 shrink-0 shadow-2xl">
+                  <div key={item.id} className="flex items-start gap-6 animate-in fade-in slide-in-from-right-10 duration-700">
+                    <div className="relative h-24 w-24 shrink-0 shadow-2xl">
                       {item.image ? (
                         <Image 
                           src={item.image} 
                           alt={item.name} 
                           fill 
-                          className="rounded-2xl object-cover border border-white/20"
+                          className="rounded-[2rem] object-cover border-4 border-white shadow-xl"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center rounded-2xl bg-black/20 border border-white/20">
-                          <ImageIcon className="h-8 w-8 text-card-foreground/10" />
+                        <div className="flex h-full w-full items-center justify-center rounded-[2rem] bg-zinc-50 border-2 border-dashed border-zinc-100">
+                          <ImageIcon className="h-8 w-8 text-zinc-200" />
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 min-w-0 pt-1">
-                      <p className="font-bold text-card-foreground text-base leading-tight truncate">
+                    <div className="flex-1 min-w-0 pt-2">
+                      <p className="font-black text-background text-lg leading-none truncate uppercase italic">
                         {item.name}
                       </p>
-                      <p className="text-card-foreground/80 font-black text-sm mt-1">
+                      <p className="text-zinc-400 font-bold text-sm mt-2 tabular-nums">
                         {formatCurrency(item.price)}
                       </p>
                       
-                      <div className="flex items-center gap-4 mt-4">
-                        <div className="flex items-center bg-black/20 rounded-full border border-white/20 p-1">
+                      <div className="flex items-center gap-5 mt-6">
+                        <div className="flex items-center bg-zinc-50 rounded-2xl border border-zinc-100 p-1.5">
                           <button 
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-full transition-all text-card-foreground/40"
+                            className="w-10 h-10 flex items-center justify-center hover:bg-white hover:text-background rounded-xl transition-all text-zinc-300"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           >
-                            <Minus className="h-4 w-4"/>
+                            <Minus className="h-5 w-5"/>
                           </button>
-                          <span className="w-10 text-center font-black text-sm text-card-foreground tabular-nums">{item.quantity}</span>
+                          <span className="w-12 text-center font-black text-lg text-background tabular-nums italic">{item.quantity}</span>
                           <button 
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-full transition-all text-card-foreground/40"
+                            className="w-10 h-10 flex items-center justify-center hover:bg-white hover:text-background rounded-xl transition-all text-zinc-300"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           >
-                            <Plus className="h-4 w-4"/>
+                            <Plus className="h-5 w-5"/>
                           </button>
                         </div>
                       </div>
                     </div>
 
                     <button 
-                      className="p-3 text-card-foreground/20 hover:text-card-foreground transition-colors mt-1"
+                      className="p-4 text-zinc-200 hover:text-rose-500 transition-colors mt-2"
                       onClick={() => removeFromCart(item.id)}
                     >
-                      <Trash2 className="h-5 w-5"/>
+                      <Trash2 className="h-6 w-6"/>
                     </button>
                   </div>
                 ))}
@@ -201,40 +198,34 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           </div>
 
           {cartItems.length > 0 && (
-            <SheetFooter className="p-8 bg-black/20 border-t border-white/10 mt-auto">
-              <div className="w-full space-y-4">
-                {/* Tax Breakdown */}
-                <div className="space-y-2 border-b border-white/10 pb-4">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-card-foreground/60">
+            <SheetFooter className="p-10 bg-zinc-50 border-t border-zinc-100 mt-auto">
+              <div className="w-full space-y-6">
+                <div className="space-y-3 border-b border-zinc-200 pb-6">
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-zinc-400">
                     <span>Subtotal</span>
-                    <span>{formatCurrency(subtotal)}</span>
+                    <span className="text-zinc-600">{formatCurrency(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-card-foreground/60">
-                    <span>CGST @ 2.5%</span>
-                    <span>{formatCurrency(cgst)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-card-foreground/60">
-                    <span>SGST @ 2.5%</span>
-                    <span>{formatCurrency(sgst)}</span>
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                    <span>Taxes (GST 5%)</span>
+                    <span className="text-zinc-600">{formatCurrency(cgst + sgst)}</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-end pt-2">
+                <div className="flex justify-between items-end">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-card-foreground/40">Grand Total</span>
-                    <div className="text-4xl font-black text-card-foreground tracking-tighter tabular-nums mt-1">
+                    <span className="text-[11px] font-black uppercase tracking-[0.5em] text-zinc-300">Grand Total</span>
+                    <div className="text-5xl font-black text-background tracking-tighter tabular-nums mt-2 italic leading-none">
                       {formatCurrency(grandTotal)}
                     </div>
                   </div>
-                  <div className="h-10 w-0.5 bg-white/20 rounded-full" />
                 </div>
                 
                 <Button
                   onClick={handleOpenCheckout}
-                  className="w-full h-16 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-primary hover:bg-accent hover:text-accent-foreground rounded-full transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95 border-none mt-4"
+                  className="w-full h-20 text-[13px] font-black uppercase tracking-[0.4em] bg-background text-white hover:bg-black rounded-[2rem] transition-all duration-700 flex items-center justify-center gap-5 shadow-2xl active:scale-95 border-none mt-6"
                 >
-                  Confirm Order
-                  <ShoppingBag className="h-4 w-4" />
+                  Checkout
+                  <ArrowRight className="h-5 w-5" />
                 </Button>
               </div>
             </SheetFooter>
@@ -242,90 +233,65 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Checkout Details Dialog */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="bg-primary text-white border-white/20 sm:max-w-[425px] rounded-[2.5rem]">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Order Details</DialogTitle>
-            <DialogDescription className="text-white/60 text-xs font-bold uppercase tracking-widest">
-              Please provide your name. Phone number is optional.
+        <DialogContent className="bg-background text-white border-white/20 sm:max-w-[450px] rounded-[3.5rem] p-10">
+          <DialogHeader className="mb-8">
+            <DialogTitle className="text-4xl font-black italic uppercase tracking-tighter leading-none">Final Step</DialogTitle>
+            <DialogDescription className="text-white/60 text-[11px] font-bold uppercase tracking-[0.3em] mt-4">
+              Enter your details to confirm the harvest.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Your Name</Label>
+          <div className="space-y-8 py-4">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-widest text-white/40 ml-2">Customer Name</Label>
               <Input
                 id="name"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Enter your name"
-                className="bg-black/20 border-white/10 text-white rounded-2xl h-12 placeholder:text-white/20 focus:ring-white/30"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Phone Number (Optional)</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                placeholder="Enter your mobile number"
-                className="bg-black/20 border-white/10 text-white rounded-2xl h-12 placeholder:text-white/20 focus:ring-white/30"
+                className="bg-white/10 border-white/10 text-white rounded-2xl h-16 px-6 font-bold placeholder:text-white/20 focus:ring-white/30 text-lg"
               />
             </div>
             
-            <div className="grid gap-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Payment Method</Label>
+            <div className="space-y-4">
+              <Label className="text-[11px] font-black uppercase tracking-widest text-white/40 ml-2">Preferred Payment</Label>
               <RadioGroup 
                 value={paymentMethod} 
                 onValueChange={(v: any) => setPaymentMethod(v)}
-                className="grid grid-cols-3 gap-3"
+                className="grid grid-cols-3 gap-4"
               >
-                <Label
-                  htmlFor="upi"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'UPI' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
-                  )}
-                >
-                  <RadioGroupItem value="UPI" id="upi" className="sr-only" />
-                  <Smartphone className="h-5 w-5" />
-                  <span className="text-[9px] font-black uppercase">UPI</span>
-                </Label>
-                <Label
-                  htmlFor="card"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'Card' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
-                  )}
-                >
-                  <RadioGroupItem value="Card" id="card" className="sr-only" />
-                  <CreditCard className="h-5 w-5" />
-                  <span className="text-[9px] font-black uppercase">Card</span>
-                </Label>
-                <Label
-                  htmlFor="cash"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'Cash' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
-                  )}
-                >
-                  <RadioGroupItem value="Cash" id="cash" className="sr-only" />
-                  <Banknote className="h-5 w-5" />
-                  <span className="text-[9px] font-black uppercase">Cash</span>
-                </Label>
+                {[
+                  { id: 'UPI', icon: Smartphone, label: 'UPI' },
+                  { id: 'Card', icon: CreditCard, label: 'Card' },
+                  { id: 'Cash', icon: Banknote, label: 'Cash' }
+                ].map((method) => (
+                  <Label
+                    key={method.id}
+                    htmlFor={method.id.toLowerCase()}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all duration-500 cursor-pointer",
+                      paymentMethod === method.id 
+                        ? "bg-white text-background border-white scale-105 shadow-2xl" 
+                        : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
+                    )}
+                  >
+                    <RadioGroupItem value={method.id} id={method.id.toLowerCase()} className="sr-only" />
+                    <method.icon className="h-6 w-6" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{method.label}</span>
+                  </Label>
+                ))}
               </RadioGroup>
             </div>
           </div>
 
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-10">
             <Button 
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder || !customerName}
-              className="w-full h-14 bg-white text-primary hover:bg-accent hover:text-accent-foreground rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all active:scale-95 border-none"
+              className="w-full h-20 bg-white text-background hover:bg-black hover:text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[13px] shadow-2xl transition-all duration-700 active:scale-95 border-none"
             >
-              {isPlacingOrder ? <Loader2 className="animate-spin" /> : "Complete Checkout"}
+              {isPlacingOrder ? <Loader2 className="animate-spin" /> : "Place Order"}
             </Button>
           </DialogFooter>
         </DialogContent>

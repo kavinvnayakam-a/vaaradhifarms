@@ -8,31 +8,31 @@
     --foreground: 0 0% 100%; /* White Text */
 
     --card: 0 0% 100%; /* White for Menu Cards */
-    --card-foreground: 0 100% 20%; /* Maroon Text */
+    --card-foreground: 28 90% 54%; /* Orange Text on White */
 
     --popover: 28 90% 54%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 0 100% 20%; /* Deep Maroon */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 100%; /* White as primary action color */
+    --primary-foreground: 28 90% 54%; /* Orange text on white */
 
-    --secondary: 0 0% 100%;
-    --secondary-foreground: 28 90% 54%;
+    --secondary: 0 0% 0% / 0.1;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 28 90% 45%;
     --muted-foreground: 0 0% 90%;
 
-    --accent: 0 0% 100%; /* White Accent */
-    --accent-foreground: 28 90% 54%;
+    --accent: 0 0% 100% / 0.2;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 100% / 0.2;
-    --input: 0 0% 100% / 0.2;
+    --border: 0 0% 100% / 0.3;
+    --input: 0 0% 100% / 0.3;
     --ring: 0 0% 100%;
 
-    --radius: 1.5rem;
+    --radius: 2rem;
   }
 }
 
@@ -45,8 +45,8 @@
     font-family: 'Inter', sans-serif;
     font-weight: 300;
     font-style: normal;
-    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
-    background-size: 32px 32px;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0);
+    background-size: 40px 40px;
   }
 }
 
@@ -94,4 +94,9 @@
 
 .animate-slide-in {
   animation: slide-in 0.6s ease-out forwards;
+}
+
+@keyframes loading {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
