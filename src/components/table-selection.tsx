@@ -1,12 +1,72 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import { ShoppingBag, Utensils, ArrowRight, Sparkles } from "lucide-react";
-import placeholderData from '@/app/lib/placeholder-images.json';
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
+
+function DineInCharacter() {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center animate-float">
+      <svg viewBox="0 0 200 200" className="w-48 h-48 drop-shadow-2xl">
+        {/* Chair */}
+        <rect x="60" y="120" width="10" height="40" fill="#f38221" opacity="0.3" />
+        <rect x="130" y="120" width="10" height="40" fill="#f38221" opacity="0.3" />
+        
+        {/* Table */}
+        <rect x="40" y="130" width="120" height="10" rx="5" fill="white" />
+        <rect x="95" y="140" width="10" height="30" fill="white" opacity="0.5" />
+        <rect x="70" y="170" width="60" height="5" rx="2" fill="white" opacity="0.2" />
+
+        {/* Character */}
+        <circle cx="100" cy="70" r="25" fill="white" className="animate-sway transform-origin-bottom" />
+        <path d="M75 130 Q 75 90 100 90 Q 125 90 125 130" fill="white" opacity="0.8" />
+        
+        {/* Plate & Food */}
+        <ellipse cx="100" cy="125" rx="20" ry="5" fill="white" />
+        <circle cx="100" cy="120" r="8" fill="#f38221" />
+        
+        {/* Steam Animation */}
+        <g className="animate-steam" style={{ animationDelay: '0s' }}>
+          <path d="M95 105 Q 90 95 95 85" stroke="white" strokeWidth="2" fill="none" opacity="0.4" />
+        </g>
+        <g className="animate-steam" style={{ animationDelay: '0.5s' }}>
+          <path d="M100 100 Q 105 90 100 80" stroke="white" strokeWidth="2" fill="none" opacity="0.4" />
+        </g>
+        <g className="animate-steam" style={{ animationDelay: '1s' }}>
+          <path d="M105 105 Q 110 95 105 85" stroke="white" strokeWidth="2" fill="none" opacity="0.4" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function TakeawayCharacter() {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center animate-float" style={{ animationDelay: '0.5s' }}>
+      <svg viewBox="0 0 200 200" className="w-48 h-48 drop-shadow-2xl">
+        {/* Character Body */}
+        <circle cx="100" cy="60" r="25" fill="white" />
+        <path d="M75 160 Q 75 85 100 85 Q 125 85 125 160" fill="white" opacity="0.8" />
+        
+        {/* Legs */}
+        <rect x="85" y="150" width="8" height="30" rx="4" fill="white" className="animate-sway" />
+        <rect x="107" y="150" width="8" height="30" rx="4" fill="white" className="animate-sway" style={{ animationDelay: '1.5s' }} />
+
+        {/* Bag */}
+        <g className="animate-sway transform-origin-top" style={{ transformOrigin: '130px 110px' }}>
+          <rect x="120" y="110" width="40" height="50" rx="4" fill="white" />
+          <path d="M125 110 Q 140 80 155 110" stroke="white" strokeWidth="3" fill="none" />
+          <path d="M130 125 L 150 125" stroke="#f38221" strokeWidth="2" opacity="0.5" />
+          <path d="M130 135 L 150 135" stroke="#f38221" strokeWidth="2" opacity="0.5" />
+          {/* Logo on bag */}
+          <circle cx="140" cy="145" r="5" fill="#f38221" />
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 export default function TableSelection() {
   const router = useRouter();
@@ -14,9 +74,6 @@ export default function TableSelection() {
   const handleSelect = (mode: string) => {
     router.push(`/?table=${mode}`);
   };
-
-  const dineInImg = placeholderData.landing.find(i => i.id === 'dine_in_character');
-  const takeawayImg = placeholderData.landing.find(i => i.id === 'takeaway_character');
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
@@ -66,17 +123,9 @@ export default function TableSelection() {
             className="group relative bg-white/10 backdrop-blur-3xl p-8 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left overflow-hidden"
           >
             <div className="flex flex-col h-full gap-8 relative z-10">
-              {/* Illustration Character */}
-              <div className="relative h-48 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500">
-                {dineInImg && (
-                  <Image 
-                    src={dineInImg.url} 
-                    alt={dineInImg.title} 
-                    fill 
-                    className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" 
-                    data-ai-hint={dineInImg.hint}
-                  />
-                )}
+              {/* Animated Character Illustration */}
+              <div className="relative h-56 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500 flex items-center justify-center">
+                <DineInCharacter />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:bg-background transition-colors duration-500">
@@ -108,17 +157,9 @@ export default function TableSelection() {
             className="group relative bg-white/10 backdrop-blur-3xl p-8 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left overflow-hidden"
           >
             <div className="flex flex-col h-full gap-8 relative z-10">
-              {/* Illustration Character */}
-              <div className="relative h-48 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500">
-                {takeawayImg && (
-                  <Image 
-                    src={takeawayImg.url} 
-                    alt={takeawayImg.title} 
-                    fill 
-                    className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" 
-                    data-ai-hint={takeawayImg.hint}
-                  />
-                )}
+              {/* Animated Character Illustration */}
+              <div className="relative h-56 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500 flex items-center justify-center">
+                <TakeawayCharacter />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 <div className="absolute top-4 left-4">
                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:bg-background transition-colors duration-500">
