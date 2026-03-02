@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -128,28 +129,28 @@ export default function SettingsManager() {
               <div className="space-y-6">
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Store Display Name</Label>
-                  <Input value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white" />
+                  <Input value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
                 </div>
                 
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Physical Address</Label>
-                  <Input value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white" />
+                  <Input value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
                 </div>
 
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Support Phone</Label>
-                  <Input value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white" />
+                  <Input value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
                 </div>
 
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">GSTIN Number</Label>
-                  <Input value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white" />
+                  <Input value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
                 </div>
 
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Visual Branding Template</Label>
                   <Select value={tempSettings.templateId} onValueChange={(v: any) => setTempSettings(s => ({...s, templateId: v}))}>
-                    <SelectTrigger className="h-14 border-zinc-200 rounded-xl font-black uppercase italic bg-white"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-14 border-zinc-200 rounded-xl font-black uppercase italic bg-white text-zinc-900"><SelectValue /></SelectTrigger>
                     <SelectContent className="rounded-2xl">
                       {templates.map(t => (
                         <SelectItem key={t.id} value={t.id} className="font-bold uppercase italic text-xs">{t.name}</SelectItem>

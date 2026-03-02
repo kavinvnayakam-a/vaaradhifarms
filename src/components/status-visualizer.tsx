@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -12,34 +13,34 @@ export function StatusVisualizer({ status }: { status: Status }) {
 
   // Status-aware callout messages
   const getCalloutText = () => {
-    if (isPending) return "Wait... just a quick nap...";
-    if (status === 'Received') return "Order's here! Waking up!";
-    if (status === 'Preparing') return "Cooking your harvest now!";
-    if (status === 'Served') return "Almost ready! Packing fresh!";
-    if (isDelivering) return "The harvest is ready! Run!";
+    if (isPending) return "Just a quick nap...";
+    if (status === 'Received') return "Order's here!";
+    if (status === 'Preparing') return "Cooking fresh!";
+    if (status === 'Served') return "Almost ready!";
+    if (isDelivering) return "The harvest is ready!";
     return "Farm is ready!";
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center pt-8 overflow-hidden">
+    <div className="relative w-full h-full flex flex-col items-center justify-center pt-8">
       
       {/* 3D-STYLED CHARACTER WORKSPACE */}
       <div className="relative flex flex-col items-center">
         
-        {/* iOS-STYLE MESSAGE BUBBLE - Sleek Popup Effect */}
+        {/* iOS-STYLE MESSAGE BUBBLE - Refined Placement & Size */}
         <div 
           key={status} // Key ensures re-animation on status change
           className={cn(
-            "absolute -top-28 left-1/2 -translate-x-1/2 z-30",
+            "absolute -top-20 left-1/2 -translate-x-1/2 z-30",
             "animate-in zoom-in-95 fade-in slide-in-from-bottom-4 duration-500 ease-out"
           )}
         >
-          <div className="relative bg-white text-zinc-900 px-6 py-3.5 rounded-[1.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-white/50 backdrop-blur-md">
-            <p className="font-bold text-[11px] leading-tight text-center whitespace-nowrap tracking-tight">
+          <div className="relative bg-white text-zinc-900 px-4 py-2 rounded-2xl shadow-xl border border-white/50 backdrop-blur-md">
+            <p className="font-bold text-[10px] leading-tight text-center whitespace-nowrap tracking-tight">
               {getCalloutText()}
             </p>
             {/* iOS Message Tail */}
-            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45" 
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45" 
                  style={{ clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)' }} />
           </div>
         </div>
@@ -56,7 +57,7 @@ export function StatusVisualizer({ status }: { status: Status }) {
                 <stop offset="0%" stopColor="#ffffff" />
                 <stop offset="100%" stopColor="#e5e7eb" />
               </radialGradient>
-              <linearGradient id="gradBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="gradBody" x1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ffffff" />
                 <stop offset="100%" stopColor="#f3f4f6" />
               </linearGradient>
