@@ -12,11 +12,11 @@ export function StatusVisualizer({ status }: { status: Status }) {
 
   // Status-aware callout messages
   const getCalloutText = () => {
-    if (isPending) return "Wait... just a nap...";
-    if (status === 'Received') return "Wake up! Order's here!";
-    if (status === 'Preparing') return "Almost done, cooking now!";
-    if (status === 'Served') return "Packing it fresh!";
-    if (isDelivering) return "Your harvest is ready! Run!";
+    if (isPending) return "Wait... just a quick nap...";
+    if (status === 'Received') return "Order's here! Waking up!";
+    if (status === 'Preparing') return "Cooking your harvest now!";
+    if (status === 'Served') return "Almost ready! Packing fresh!";
+    if (isDelivering) return "The harvest is ready! Run!";
     return "Farm is ready!";
   };
 
@@ -26,15 +26,21 @@ export function StatusVisualizer({ status }: { status: Status }) {
       {/* 3D-STYLED CHARACTER WORKSPACE */}
       <div className="relative flex flex-col items-center">
         
-        {/* Callout Speech Bubble - Realistic 3D floating effect */}
-        <div className={cn(
-          "absolute -top-24 left-1/2 -translate-x-1/2 z-30 transition-all duration-700",
-          "animate-float shadow-2xl"
-        )}>
-          <div className="relative bg-white text-background px-6 py-3 rounded-2xl font-black uppercase italic text-[10px] tracking-widest whitespace-nowrap border-4 border-background/10">
-            {getCalloutText()}
-            {/* Bubble Tail */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-background/10" />
+        {/* iOS-STYLE MESSAGE BUBBLE - Sleek Popup Effect */}
+        <div 
+          key={status} // Key ensures re-animation on status change
+          className={cn(
+            "absolute -top-28 left-1/2 -translate-x-1/2 z-30",
+            "animate-in zoom-in-95 fade-in slide-in-from-bottom-4 duration-500 ease-out"
+          )}
+        >
+          <div className="relative bg-white text-zinc-900 px-6 py-3.5 rounded-[1.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-white/50 backdrop-blur-md">
+            <p className="font-bold text-[11px] leading-tight text-center whitespace-nowrap tracking-tight">
+              {getCalloutText()}
+            </p>
+            {/* iOS Message Tail */}
+            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45" 
+                 style={{ clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)' }} />
           </div>
         </div>
 

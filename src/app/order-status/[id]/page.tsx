@@ -119,10 +119,10 @@ export default function OrderStatusPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20 overflow-hidden relative text-white selection:bg-white/20">
-      {/* EXTREME TOP RIGHT LOGO - SMALLER */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-white/95 px-4 py-1.5 rounded-xl shadow-lg border border-white/20">
-          <Image src={LOGO_URL} alt="Vaaradhi Farms" width={70} height={30} className="object-contain" priority />
+      {/* EXTREME TOP LEFT LOGO - 0 PADDING ANCHOR */}
+      <div className="fixed top-0 left-0 z-50">
+        <div className="bg-white px-6 py-4 rounded-br-[2rem] shadow-2xl border-r border-b border-white/10 backdrop-blur-md">
+          <Image src={LOGO_URL} alt="Vaaradhi Farms" width={80} height={34} className="object-contain" priority />
         </div>
       </div>
 
