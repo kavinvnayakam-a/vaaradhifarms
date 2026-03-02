@@ -41,7 +41,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_logo_final-02.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
 type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'analytics' | 'settings';
 
@@ -89,13 +89,13 @@ export default function AdminDashboard() {
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
 
-  if (!isAuthLoaded) return <div className="h-screen w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>;
+  if (!isAuthLoaded) return <div className="h-screen w-full flex items-center justify-center bg-background"><Loader2 className="animate-spin text-white" /></div>;
   if (!auth) return null;
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-gray-50 text-primary font-sans">
-        <Sidebar collapsible="icon" className="bg-primary text-white">
+      <div className="flex h-screen w-full bg-background text-white font-sans">
+        <Sidebar collapsible="icon" className="bg-primary text-white border-r border-white/10">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center">
             <div className="bg-white px-4 py-2 rounded-xl shadow-xl">
               <Image src={LOGO_URL} alt="Vaaradhi Farms" width={120} height={52} className="object-contain" />
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.id} className="mb-2">
-                  <SidebarMenuButton onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} isActive={activeTab === item.id} className={cn("flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-widest", activeTab === item.id ? "bg-accent text-white" : "text-white/60 hover:bg-white/10")}>
+                  <SidebarMenuButton onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} isActive={activeTab === item.id} className={cn("flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-widest", activeTab === item.id ? "bg-white text-background" : "text-white/60 hover:bg-white/10")}>
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span>{item.label}</span>
                   </SidebarMenuButton>
@@ -114,22 +114,24 @@ export default function AdminDashboard() {
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="p-4">
+          <SidebarFooter className="p-4 border-t border-white/10">
             <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full px-2 py-6">
               <LogOut className="w-4 h-4" /> <span>Sign Out</span>
             </button>
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col h-screen overflow-hidden">
-          <header className="sticky top-0 z-30 bg-white border-b px-8 py-6 flex items-center justify-between shadow-sm">
+        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background">
+          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-white/10 px-8 py-6 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-6">
-              <SidebarTrigger className="text-primary"><PanelLeft size={24} /></SidebarTrigger>
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter">{activeTab.replace('_', ' ')}</h2>
+              <SidebarTrigger className="text-white"><PanelLeft size={24} /></SidebarTrigger>
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter">
+                {activeTab.replace('_', ' ')}
+              </h2>
             </div>
             <div className="flex items-center gap-4">
-              <div className="px-5 py-3 bg-primary/5 rounded-2xl flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="px-5 py-3 bg-white/10 rounded-2xl flex items-center gap-2 border border-white/10">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Live Console</span>
               </div>
             </div>

@@ -4,42 +4,41 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 100% 15%; /* Deep Maroon Text */
+    --background: 28 90% 54%; /* Vaaradhi Orange #f38221 */
+    --foreground: 0 0% 100%; /* White Text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 100% 15%;
+    --card: 28 90% 50%; /* Slightly darker orange for cards */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 100% 15%;
+    --popover: 28 90% 54%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 0 100% 20%; /* Deep Maroon */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 28 90% 96%;
-    --secondary-foreground: 28 90% 20%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 28 90% 54%;
 
-    --muted: 28 20% 90%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 28 90% 45%;
+    --muted-foreground: 0 0% 90%;
 
-    --accent: 28 90% 54%; /* Vaaradhi Orange #f38221 */
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 100%; /* White Accent */
+    --accent-foreground: 28 90% 54%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 28 90% 54%;
+    --border: 0 0% 100% / 0.2;
+    --input: 0 0% 100% / 0.2;
+    --ring: 0 0% 100%;
 
-    --radius: 1rem;
+    --radius: 1.5rem;
   }
 
   .dark {
     --background: 0 100% 10%;
     --foreground: 0 0% 100%;
     --primary: 28 90% 54%;
-    /* ... rest of dark theme as needed */
   }
 }
 
@@ -86,5 +85,5 @@
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-primary/20 rounded-full hover:bg-primary/40;
+  @apply bg-white/20 rounded-full hover:bg-white/40;
 }

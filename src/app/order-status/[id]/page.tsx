@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 
 const HERO_IMG = "https://picsum.photos/seed/farm_fresh/1200/800";
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_logo_final-02.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
 const PICKUP_TIMER_DURATION = 3 * 60;
@@ -95,26 +95,26 @@ export default function OrderStatusPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-10 overflow-hidden relative text-primary">
+    <div className="min-h-screen bg-background pb-10 overflow-hidden relative text-white">
       <div className="relative h-[35vh] w-full overflow-hidden bg-primary">
-        <Image src={HERO_IMG} alt="Farm Fresh" fill className="object-cover opacity-60" priority />
+        <Image src={HERO_IMG} alt="Farm Fresh" fill className="object-cover opacity-40" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute top-8 right-6 z-30">
-          <div className="relative p-4 bg-white rounded-2xl shadow-2xl border-2 border-accent">
+          <div className="relative p-4 bg-white rounded-2xl shadow-2xl border-4 border-white/20">
             <Image src={LOGO_URL} alt="Vaaradhi Farms" width={100} height={43} className="object-contain" />
           </div>
         </div>
       </div>
 
       <div className="relative -mt-20 px-4 md:px-6 z-20">
-        <div className="bg-white rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-2 border-primary/5">
-          <div className="mb-10 pb-6 border-b border-primary/10 flex justify-between items-end">
+        <div className="bg-white/10 backdrop-blur-3xl rounded-[3rem] p-8 md:p-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/20">
+          <div className="mb-10 pb-6 border-b border-white/10 flex justify-between items-end">
             <div>
-              <p className="text-primary/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Order Token</p>
-              <h2 className="text-6xl font-black text-primary italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
+              <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Order Token</p>
+              <h2 className="text-6xl font-black text-white italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
             </div>
             {isTimerActive && (
-              <div className="bg-accent px-4 py-2 rounded-xl text-white font-black tabular-nums">
+              <div className="bg-primary px-4 py-2 rounded-xl text-white font-black tabular-nums border border-white/20">
                 {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
               </div>
             )}
@@ -124,14 +124,14 @@ export default function OrderStatusPage() {
             {steps.map((step, idx) => (
               <div key={idx} className="relative flex gap-8">
                 {idx !== steps.length - 1 && (
-                  <div className={cn("absolute left-[21px] top-12 w-[2px] h-10 transition-colors duration-500", step.completed ? "bg-accent" : "bg-primary/10")} />
+                  <div className={cn("absolute left-[21px] top-12 w-[2px] h-10 transition-colors duration-500", step.completed ? "bg-white" : "bg-white/10")} />
                 )}
-                <div className={cn("relative z-10 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-700", step.completed || step.active ? "bg-accent border-accent text-white" : "bg-white border-primary/10 text-primary/10")}>
+                <div className={cn("relative z-10 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-700", step.completed || step.active ? "bg-white border-white text-background" : "bg-transparent border-white/10 text-white/10")}>
                   <step.icon size={20} className={cn(step.active && "animate-pulse")} />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h3 className={cn("font-black text-lg uppercase tracking-tight italic leading-none", step.completed || step.active ? "text-primary" : "text-primary/20")}>{step.label}</h3>
-                  <p className="text-[9px] font-bold uppercase tracking-widest mt-1.5 text-primary/40">Vaaradhi Farms Authentic</p>
+                  <h3 className={cn("font-black text-lg uppercase tracking-tight italic leading-none", step.completed || step.active ? "text-white" : "text-white/20")}>{step.label}</h3>
+                  <p className="text-[9px] font-bold uppercase tracking-widest mt-1.5 text-white/40">Vaaradhi Farms Authentic</p>
                 </div>
               </div>
             ))}

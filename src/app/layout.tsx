@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Vaaradhi Farms',
   description: 'Pure, authentic flavors from Vaaradhi Farms.',
   icons: {
-    icon: 'https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_logo_final-02.webp?alt=media&token=648ab03a-a11d-4d9e-9614-b4408da79a4c',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa',
   },
   robots: {
     index: false,
