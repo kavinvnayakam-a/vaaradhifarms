@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -8,9 +9,9 @@ import KotView from "@/components/admin/kot-view";
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import TodayOrders from "@/components/admin/today-orders";
 import SettingsManager from "@/components/admin/settings-manager";
-import { useFirestore } from "@/firebase";
-import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useFirestore, useUser, useAuth } from "@/firebase";
 import { collection, onSnapshot, query } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import { 
   LogOut, 
   TrendingUp,
@@ -45,20 +46,21 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('counter');
   const [newOrderCount, setNewOrderCount] = useState(0);
-  const [auth, setAuth, isAuthLoaded] = useLocalStorage('vaaradhi-admin-auth', false);
+  const { user, isUserLoading } = useUser();
+  const authInstance = useAuth();
   const firestore = useFirestore();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (isAuthLoaded && !auth) router.push("/admin/login");
-  }, [auth, isAuthLoaded, router]);
+    if (!isUserLoading && !user) router.push("/admin/login");
+  }, [user, isUserLoading, router]);
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-coin-collect-1915.mp3');
   }, []);
 
   useEffect(() => {
-    if (!firestore || !auth) return;
+    if (!firestore || !user) return;
     const q = query(collection(firestore, "orders"));
     let isInitialLoad = true;
     const unsubSound = onSnapshot(q, (snapshot) => {
@@ -71,9 +73,14 @@ export default function AdminDashboard() {
       });
     });
     return () => unsubSound();
-  }, [firestore, auth]);
+  }, [firestore, user]);
 
-  const handleSignOut = () => { setAuth(false); router.push("/admin/login"); };
+  const handleSignOut = async () => { 
+    if (authInstance) {
+      await signOut(authInstance);
+      router.push("/admin/login");
+    }
+  };
 
   const navItems: { id: TabType; label: string; icon: any; showBadge?: boolean }[] = [
     { id: 'counter', label: 'Counter Feed', icon: Store, showBadge: newOrderCount > 0 },
@@ -84,8 +91,8 @@ export default function AdminDashboard() {
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
 
-  if (!isAuthLoaded) return <div className="h-screen w-full flex items-center justify-center bg-white"><Loader2 className="animate-spin text-background" /></div>;
-  if (!auth) return null;
+  if (isUserLoading) return <div className="h-screen w-full flex items-center justify-center bg-white"><Loader2 className="animate-spin text-background" /></div>;
+  if (!user) return null;
 
   return (
     <SidebarProvider defaultOpen={true}>

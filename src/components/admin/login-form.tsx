@@ -3,15 +3,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/firebase";
-import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
+import { useAuth, useUser } from "@/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import Image from "next/image";
 import { GetPikLogo } from "@/components/getpik-logo";
 
@@ -21,66 +20,58 @@ export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const authInstance = useAuth();
-  const [auth, setAuth, isAuthLoaded] = useLocalStorage('vaaradhi-admin-auth', false);
+  const { user, isUserLoading } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (isAuthLoaded && auth === true) {
+    if (!isUserLoading && user) {
       router.push("/admin");
     }
-  }, [auth, isAuthLoaded, router]);
+  }, [user, isUserLoading, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!authInstance) return;
+    
     setIsLoading(true);
     
-    const allowedEmails = [
-      "info@getpik.in", 
-      "admin@vaaradhifarms.com", 
-      "murugananthands@gmail.com",
-      "admin@getpik.in"
-    ];
-    
-    setTimeout(() => {
-      if (allowedEmails.includes(email.toLowerCase().trim()) && password.length >= 4) {
-        setAuth(true);
-        if (authInstance) initiateAnonymousSignIn(authInstance);
-        toast({ title: "Authentication Successful", description: "Welcome to Vaaradhi Farms Console." });
-      } else {
-        setIsLoading(false);
-        toast({ variant: "destructive", title: "Access Denied", description: "Invalid administrator credentials." });
-      }
-    }, 1200);
+    try {
+      await signInWithEmailAndPassword(authInstance, email.toLowerCase().trim(), password);
+      toast({ title: "Authentication Successful", description: "Welcome to Vaaradhi Farms Console." });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setIsLoading(false);
+      let message = "Invalid administrator credentials.";
+      if (error.code === 'auth/user-not-found') message = "Administrator account not found.";
+      if (error.code === 'auth/wrong-password') message = "Incorrect security key.";
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Access Denied", 
+        description: message 
+      });
+    }
   };
 
-  if (!isAuthLoaded) return null;
+  if (isUserLoading) return <div className="h-screen w-full flex items-center justify-center bg-background"><Loader2 className="animate-spin text-white" /></div>;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-6 relative overflow-hidden">
-      {/* Background Layer with Farm-Style Depth */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-white/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-black/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/canvas.png')] opacity-10" />
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-white blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-white/10 blur-[120px]" />
       </div>
 
       <div className="w-full max-w-md space-y-12 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         
-        {/* Boutique Branding Section */}
         <div className="flex flex-col items-center gap-8">
-          <div className="relative group transition-all duration-700">
-            <div className="absolute inset-0 bg-white/20 rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all" />
-            <div className="relative bg-white px-12 py-6 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border-4 border-white/30">
-              <Image 
-                src={LOGO_URL} 
-                alt="Vaaradhi Farms" 
-                width={180} 
-                height={78} 
-                className="object-contain" 
-                priority 
-              />
+          <div className="relative group transition-all duration-700 hover:scale-105">
+            <div className="absolute inset-0 bg-white/20 rounded-[2.5rem] blur-2xl group-hover:blur-3xl transition-all" />
+            <div className="relative bg-white px-10 py-6 rounded-[2.5rem] shadow-2xl border-4 border-white/30">
+              <Image src={LOGO_URL} alt="Vaaradhi Farms" width={200} height={86} className="object-contain" priority />
             </div>
           </div>
           
@@ -89,13 +80,12 @@ export default function LoginForm() {
               Farm Console
             </h1>
             <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">
-              Boutique Management POS
+              Restaurant Management POS
             </p>
           </div>
         </div>
 
-        {/* Glass-morphism Login Card */}
-        <Card className="border-none bg-white/10 backdrop-blur-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] rounded-[3.5rem] overflow-hidden">
+        <Card className="border-none bg-white/10 backdrop-blur-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] rounded-[3rem] overflow-hidden">
           <CardContent className="px-10 py-14">
             <form onSubmit={handleLogin} className="space-y-8">
               <div className="space-y-3">
@@ -107,7 +97,7 @@ export default function LoginForm() {
                     placeholder="admin@getpik.in" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2" 
+                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all" 
                     required 
                   />
                 </div>
@@ -122,7 +112,7 @@ export default function LoginForm() {
                     placeholder="••••••••" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all border-2" 
+                    className="pl-12 h-14 bg-white/5 border-white/10 text-white rounded-2xl font-bold placeholder:text-white/10 focus:bg-white/10 focus:border-white/30 transition-all" 
                     required 
                   />
                 </div>
@@ -131,7 +121,7 @@ export default function LoginForm() {
               <Button 
                 type="submit" 
                 disabled={isLoading} 
-                className="w-full h-16 bg-white text-background hover:bg-zinc-900 hover:text-white rounded-[1.5rem] shadow-2xl transition-all active:scale-95 uppercase font-black tracking-[0.2em] text-xs border-none"
+                className="w-full h-16 bg-white text-background hover:bg-black hover:text-white rounded-2xl shadow-2xl transition-all active:scale-95 uppercase font-black tracking-[0.2em] text-xs border-none"
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : (
                   <div className="flex items-center gap-3">
@@ -154,9 +144,8 @@ export default function LoginForm() {
           </CardContent>
         </Card>
         
-        {/* GetPik Branding */}
-        <div className="pt-4">
-           <GetPikLogo variant="opacity" className="scale-90" />
+        <div className="flex flex-col items-center gap-4">
+           <GetPikLogo variant="opacity" />
         </div>
       </div>
     </div>
