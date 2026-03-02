@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem, Table as TableType } from '@/lib/types';
 import { 
-  Plus, Store, Hash, Clock, User, ArrowRight, ShoppingBag, Search, CreditCard, Smartphone, Banknote, X, Printer
+  Plus, Store, Hash, Clock, User, ArrowRight, ShoppingBag, Search, X, Printer
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ReceiptRouter, KOTComponent, CollectionTokenComponent, type PrintSettings as AppPrintSettings } from './receipt-templates';
 
 interface PrintSettings extends AppPrintSettings {}
@@ -38,7 +37,6 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
 export default function OrderManager() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [tables, setTables] = useState<TableType[]>([]);
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
@@ -155,7 +153,7 @@ export default function OrderManager() {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <span className="text-2xl font-black text-zinc-900 italic tracking-tighter block leading-none">
-                  {order.tableId === 'Takeaway' ? 'Takeaway' : 'Dine-In'}
+                  {order.tableId}
                 </span>
                 <span className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-2 block">#{order.orderNumber}</span>
               </div>
@@ -215,7 +213,6 @@ export default function OrderManager() {
         )}
       </div>
 
-      {/* Manual Order Dialog */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="max-w-6xl rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl">
           <DialogHeader className="sr-only">
@@ -223,7 +220,6 @@ export default function OrderManager() {
             <DialogDescription>Create a new order by selecting items from the menu.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 h-[80vh]">
-            {/* Menu Selection */}
             <div className="md:col-span-7 bg-zinc-50 p-10 flex flex-col gap-8">
               <div className="flex items-center justify-between">
                 <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Farm Menu</h3>
@@ -263,7 +259,6 @@ export default function OrderManager() {
               </ScrollArea>
             </div>
 
-            {/* Order Details */}
             <div className="md:col-span-5 bg-white p-10 flex flex-col gap-8 border-l border-zinc-100">
               <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Order Summary</h3>
               
@@ -335,7 +330,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* Print Preview Dialog */}
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-[75vw] rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
           <DialogHeader className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
@@ -359,12 +353,10 @@ export default function OrderManager() {
                <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Kitchen Ticket (KOT)</p>
                {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
             </div>
-            {printingOrder?.tableId === 'Takeaway' && (
-              <div className="flex-shrink-0 space-y-4">
-                <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
-                <CollectionTokenComponent order={printingOrder} />
-              </div>
-            )}
+            <div className="flex-shrink-0 space-y-4">
+              <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
+              {printingOrder && <CollectionTokenComponent order={printingOrder} />}
+            </div>
           </div>
 
           <div className="p-8 bg-black/40 border-t border-white/5">
@@ -378,13 +370,12 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* Hidden print area */}
       <div id="printable-receipt" className="hidden">
         {printingOrder && (
           <>
             <div style={{ breakAfter: 'page' }}><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
             <div style={{ breakAfter: 'page' }}><KOTComponent order={printingOrder} tableNumber={null} /></div>
-            {printingOrder.tableId === 'Takeaway' && <div><CollectionTokenComponent order={printingOrder} /></div>}
+            <div><CollectionTokenComponent order={printingOrder} /></div>
           </>
         )}
       </div>

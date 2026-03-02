@@ -9,7 +9,6 @@ import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
 import TodayOrders from "@/components/admin/today-orders";
 import SettingsManager from "@/components/admin/settings-manager";
-import MenuAIImporter from "@/components/admin/menu-ai-importer";
 import { useFirestore } from "@/firebase";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -23,8 +22,7 @@ import {
   PanelLeft,
   LayoutList,
   Loader2,
-  UtensilsCrossed,
-  Sparkles
+  UtensilsCrossed
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -43,7 +41,7 @@ import { GetPikLogo } from "@/components/getpik-logo";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
-type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'ai_importer' | 'analytics' | 'settings';
+type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'analytics' | 'settings';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -85,7 +83,6 @@ export default function AdminDashboard() {
     { id: 'today_orders', label: "Today's Orders", icon: LayoutList },
     { id: 'history', label: 'Order Archives', icon: Clock },
     { id: 'menu', label: 'Menu Config', icon: UtensilsCrossed },
-    { id: 'ai_importer', label: 'AI Importer', icon: Sparkles },
     { id: 'analytics', label: 'Business', icon: TrendingUp },
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
@@ -96,7 +93,6 @@ export default function AdminDashboard() {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen w-full bg-white text-zinc-900 font-sans">
-        {/* Sidebar - Vibrant Orange */}
         <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center">
             <div className="bg-white px-4 py-2 rounded-xl shadow-xl">
@@ -138,7 +134,6 @@ export default function AdminDashboard() {
           </SidebarFooter>
         </Sidebar>
 
-        {/* Main Content - Pure White */}
         <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white">
           <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100 px-8 py-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-6">
@@ -161,7 +156,6 @@ export default function AdminDashboard() {
               {activeTab === 'today_orders' && <TodayOrders />}
               {activeTab === 'history' && <OrderHistory />}
               {activeTab === 'menu' && <MenuManager />}
-              {activeTab === 'ai_importer' && <MenuAIImporter />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
               {activeTab === 'settings' && <SettingsManager />}
             </div>

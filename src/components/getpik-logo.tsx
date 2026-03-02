@@ -19,9 +19,9 @@ export function GetPikLogo({ className, variant = 'light' }: GetPikLogoProps) {
           "font-black text-xl tracking-tighter uppercase italic transition-colors",
           variant === 'light' ? "text-white" : variant === 'dark' ? "text-zinc-900" : "text-white"
         )}>
-          Get<span className="text-[#f38221] group-hover:text-white transition-colors">Pik</span>
+          Get<span className="text-zinc-400 group-hover:text-white transition-colors">Pik</span>
         </span>
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse shadow-[0_0_8px_rgba(161,161,170,0.6)]" />
       </div>
       <p className={cn(
         "text-[7px] font-black uppercase tracking-[0.4em] transition-opacity",

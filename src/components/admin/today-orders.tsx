@@ -7,7 +7,7 @@ import {
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
-  Printer, ShoppingBag, Clock, User, LayoutList, Search, X, ReceiptText
+  Printer, ShoppingBag, User, LayoutList, Search, X, ReceiptText
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency, cn } from '@/lib/utils';
@@ -204,12 +204,10 @@ export default function TodayOrders() {
                <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Kitchen Order Ticket</p>
                {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
             </div>
-            {printingOrder?.tableId === 'Takeaway' && (
-              <div className="space-y-4">
-                <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
-                <CollectionTokenComponent order={printingOrder} />
-              </div>
-            )}
+            <div className="space-y-4">
+              <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
+              {printingOrder && <CollectionTokenComponent order={printingOrder} />}
+            </div>
           </div>
 
           <div className="p-8 bg-black/40 border-t border-white/5">
