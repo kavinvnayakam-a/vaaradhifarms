@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import { ShoppingBag, Utensils, ArrowRight, Sparkles } from "lucide-react";
+import { GetPikLogo } from "@/components/getpik-logo";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -188,9 +189,13 @@ export default function TableSelection() {
         </div>
 
         {/* Footer info */}
-        <div className="pt-12 opacity-30 flex flex-col items-center gap-4">
-          <div className="h-px w-32 bg-white/20" />
-          <p className="text-[9px] font-black uppercase tracking-[0.8em]">Vaaradhi Farms Boutique Experience</p>
+        <div className="pt-12 flex flex-col items-center gap-10">
+          <div className="flex flex-col items-center gap-4 opacity-30">
+            <div className="h-px w-32 bg-white/20" />
+            <p className="text-[9px] font-black uppercase tracking-[0.8em]">Vaaradhi Farms Boutique Experience</p>
+          </div>
+          
+          <GetPikLogo variant="opacity" className="scale-90" />
         </div>
       </div>
     </div>
