@@ -6,7 +6,9 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { importMenu, type ImportMenuOutput } from "@/ai/flows/import-menu-flow";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Sparkles, Upload, CheckCircle2, Trash2, AlertCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, Sparkles, Upload, CheckCircle2, Trash2, AlertCircle, Type } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatCurrency } from "@/lib/utils";
 import Image from "next/image";
@@ -14,6 +16,7 @@ import Image from "next/image";
 export default function MenuAIImporter() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [rawText, setRawText] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [extractedItems, setExtractedItems] = useState<ImportMenuOutput['items'] | null>(null);
@@ -31,16 +34,21 @@ export default function MenuAIImporter() {
     }
   };
 
-  const handleExtract = async () => {
-    if (!preview) return;
+  const handleExtract = async (type: 'image' | 'text') => {
+    if (type === 'image' && !preview) return;
+    if (type === 'text' && !rawText.trim()) return;
+
     setIsExtracting(true);
     try {
-      const result = await importMenu({ photoDataUri: preview });
+      const result = await importMenu({ 
+        photoDataUri: type === 'image' ? preview! : undefined,
+        rawText: type === 'text' ? rawText : undefined
+      });
       setExtractedItems(result.items);
       toast({ title: "Extraction Successful", description: `Found ${result.items.length} items.` });
     } catch (err) {
       console.error(err);
-      toast({ variant: "destructive", title: "AI Error", description: "Could not read the menu. Please try a clearer photo." });
+      toast({ variant: "destructive", title: "AI Error", description: "Could not process the menu. Please try again with clearer input." });
     } finally {
       setIsExtracting(false);
     }
@@ -65,6 +73,7 @@ export default function MenuAIImporter() {
       setExtractedItems(null);
       setFile(null);
       setPreview(null);
+      setRawText("");
     } catch (err) {
       toast({ variant: "destructive", title: "Sync Failed" });
     } finally {
@@ -87,52 +96,98 @@ export default function MenuAIImporter() {
           <div>
             <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter">AI Menu Importer</h3>
             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
-              Digitize physical menus instantly using Vision AI
+              Digitize physical menus or raw text using Vision & Language AI
             </p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Upload & Preview Section */}
+        {/* Upload & Paste Section */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="border-2 border-dashed border-zinc-200 rounded-[3rem] overflow-hidden bg-zinc-50/50">
-            <CardContent className="p-8">
-              {!preview ? (
-                <label className="flex flex-col items-center justify-center gap-4 cursor-pointer py-20 hover:bg-white transition-colors group">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <Upload size={32} className="text-background" />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-black uppercase italic text-zinc-900">Upload Menu Image</p>
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">JPG, PNG or PDF (Max 10MB)</p>
-                  </div>
-                  <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                </label>
-              ) : (
-                <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-2xl">
-                  <Image src={preview} alt="Menu Preview" fill className="object-cover" />
-                  <button 
-                    onClick={() => { setPreview(null); setFile(null); setExtractedItems(null); }}
-                    className="absolute top-4 right-4 bg-background text-white p-2 rounded-xl shadow-xl hover:bg-zinc-900 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="image" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-zinc-100 p-1 rounded-2xl h-14">
+              <TabsTrigger value="image" className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-background shadow-sm">
+                <Upload size={14} className="mr-2" /> Photo
+              </TabsTrigger>
+              <TabsTrigger value="text" className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-background shadow-sm">
+                <Type size={14} className="mr-2" /> Bulk Text
+              </TabsTrigger>
+            </TabsList>
 
-          {preview && !extractedItems && (
-            <Button 
-              onClick={handleExtract} 
-              disabled={isExtracting}
-              className="w-full h-16 bg-background text-white rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl shadow-background/20 hover:bg-zinc-900 transition-all flex items-center justify-center gap-3 active:scale-95"
-            >
-              {isExtracting ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
-              {isExtracting ? "AI is reading menu..." : "Start AI Extraction"}
-            </Button>
-          )}
+            <TabsContent value="image" className="mt-6 space-y-6">
+              <Card className="border-2 border-dashed border-zinc-200 rounded-[3rem] overflow-hidden bg-zinc-50/50">
+                <CardContent className="p-8">
+                  {!preview ? (
+                    <label className="flex flex-col items-center justify-center gap-4 cursor-pointer py-20 hover:bg-white transition-colors group">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                        <Upload size={32} className="text-background" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-black uppercase italic text-zinc-900">Upload Menu Image</p>
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">JPG or PNG</p>
+                      </div>
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                    </label>
+                  ) : (
+                    <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-2xl">
+                      <Image src={preview} alt="Menu Preview" fill className="object-cover" />
+                      <button 
+                        onClick={() => { setPreview(null); setFile(null); setExtractedItems(null); }}
+                        className="absolute top-4 right-4 bg-background text-white p-2 rounded-xl shadow-xl hover:bg-zinc-900 transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              {preview && !extractedItems && (
+                <Button 
+                  onClick={() => handleExtract('image')} 
+                  disabled={isExtracting}
+                  className="w-full h-16 bg-background text-white rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl shadow-background/20 hover:bg-zinc-900 transition-all flex items-center justify-center gap-3 active:scale-95"
+                >
+                  {isExtracting ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
+                  {isExtracting ? "AI is reading photo..." : "Extract from Image"}
+                </Button>
+              )}
+            </TabsContent>
+
+            <TabsContent value="text" className="mt-6 space-y-6">
+              <Card className="border-2 border-zinc-100 rounded-[3rem] overflow-hidden bg-white shadow-sm">
+                <CardContent className="p-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Paste Raw Data</p>
+                      <button 
+                        onClick={() => setRawText("")}
+                        className="text-[9px] font-black uppercase text-rose-500 hover:underline"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <Textarea 
+                      placeholder="e.g. Chicken Biryani - 250&#10;Crispy Fish Fillet - Deep fried white fish - 320&#10;Main Course..."
+                      value={rawText}
+                      onChange={(e) => setRawText(e.target.value)}
+                      className="min-h-[300px] bg-zinc-50 border-zinc-100 rounded-2xl font-bold p-6 focus:bg-white transition-colors outline-none italic"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              {!extractedItems && (
+                <Button 
+                  onClick={() => handleExtract('text')} 
+                  disabled={isExtracting || !rawText.trim()}
+                  className="w-full h-16 bg-background text-white rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl shadow-background/20 hover:bg-zinc-900 transition-all flex items-center justify-center gap-3 active:scale-95"
+                >
+                  {isExtracting ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
+                  {isExtracting ? "AI is parsing text..." : "Extract from Text"}
+                </Button>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Results Section */}
@@ -144,7 +199,7 @@ export default function MenuAIImporter() {
                </div>
                <h3 className="text-2xl font-black uppercase italic text-zinc-300 tracking-tighter">Awaiting Input</h3>
                <p className="text-[10px] font-bold text-zinc-200 uppercase tracking-widest mt-2 max-w-xs">
-                 Upload a clear photo of your menu card to see the magic happen.
+                 Upload a photo or paste raw menu text to see the magic happen.
                </p>
             </div>
           ) : (
@@ -153,7 +208,10 @@ export default function MenuAIImporter() {
                 <h4 className="text-xl font-black uppercase italic text-zinc-900 tracking-tight flex items-center gap-3">
                   <CheckCircle2 className="text-emerald-500" /> Review Extracted Items
                 </h4>
-                <span className="px-4 py-1.5 bg-zinc-100 rounded-full text-[9px] font-black uppercase text-zinc-400">{extractedItems.length} Items Found</span>
+                <div className="flex gap-2">
+                  <span className="px-4 py-1.5 bg-zinc-100 rounded-full text-[9px] font-black uppercase text-zinc-400">{extractedItems.length} Items Found</span>
+                  <button onClick={() => setExtractedItems(null)} className="px-4 py-1.5 bg-rose-50 text-rose-500 rounded-full text-[9px] font-black uppercase hover:bg-rose-100 transition-colors">Reset</button>
+                </div>
               </div>
 
               <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">

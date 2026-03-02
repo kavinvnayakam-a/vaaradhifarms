@@ -2,7 +2,7 @@
 /**
  * @fileOverview A menu extraction AI agent.
  *
- * - importMenu - A function that extracts menu items from an image.
+ * - importMenu - A function that extracts menu items from an image or raw text.
  * - ImportMenuInput - The input type for the importMenu function.
  * - ImportMenuOutput - The return type for the importMenu function.
  */
@@ -13,9 +13,14 @@ import { z } from 'genkit';
 const ImportMenuInputSchema = z.object({
   photoDataUri: z
     .string()
+    .optional()
     .describe(
       "A photo of a restaurant menu, as a data URI that must include a MIME type and use Base64 encoding."
     ),
+  rawText: z
+    .string()
+    .optional()
+    .describe("Raw text containing menu information to be parsed."),
 });
 export type ImportMenuInput = z.infer<typeof ImportMenuInputSchema>;
 
@@ -27,7 +32,7 @@ const ExtractedMenuItemSchema = z.object({
 });
 
 const ImportMenuOutputSchema = z.object({
-  items: z.array(ExtractedMenuItemSchema).describe('List of items extracted from the menu photo.'),
+  items: z.array(ExtractedMenuItemSchema).describe('List of items extracted from the menu photo or text.'),
 });
 export type ImportMenuOutput = z.infer<typeof ImportMenuOutputSchema>;
 
@@ -41,16 +46,24 @@ const prompt = ai.definePrompt({
   output: { schema: ImportMenuOutputSchema },
   prompt: `You are an expert digital menu digitizer. 
   
-Look at this menu photo and extract every item listed. 
+Analyze the provided menu information (either from a photo or raw text) and extract every item listed. 
 For each item, identify:
 1. The Name
 2. The Description (if provided)
 3. The Price (convert currency symbols to a plain number)
 4. The Category (e.g. if it's listed under 'Chef Specials', use that as the category)
 
-Ensure all prices are numerical. If a range is given, use the lower price.
+Ensure all prices are numerical. If a range is given, use the lower price. 
+If text is provided, it might be messy—clean it up and structure it correctly.
 
-Photo: {{media url=photoDataUri}}`,
+{{#if photoDataUri}}
+Photo: {{media url=photoDataUri}}
+{{/if}}
+
+{{#if rawText}}
+Raw Menu Text:
+{{{rawText}}}
+{{/if}}`,
 });
 
 const importMenuFlow = ai.defineFlow(
