@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { MenuItem } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function MenuManager() {
   const [items, setItems] = useState<MenuItem[]>([]);
