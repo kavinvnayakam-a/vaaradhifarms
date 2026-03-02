@@ -1,153 +1,150 @@
 "use client"
 
 import React from 'react';
-import { Sparkles, Utensils, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Status = 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Handover' | 'Completed';
 
 export function StatusVisualizer({ status }: { status: Status }) {
-  // Character stays sleeping only in 'Pending'
   const isPending = status === 'Pending';
-  // Character wakes up and cooks when order is Received, Preparing, or Served
   const isPreparing = ['Received', 'Preparing', 'Served'].includes(status);
-  // Character runs sideways to deliver when status is Ready, Handover, or Completed
   const isDelivering = ['Ready', 'Handover', 'Completed'].includes(status);
 
+  // Status-aware callout messages
+  const getCalloutText = () => {
+    if (isPending) return "Wait... just a nap...";
+    if (status === 'Received') return "Wake up! Order's here!";
+    if (status === 'Preparing') return "Almost done, cooking now!";
+    if (status === 'Served') return "Packing it fresh!";
+    if (isDelivering) return "Your harvest is ready! Run!";
+    return "Farm is ready!";
+  };
+
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-end pb-12 overflow-hidden">
-      <div className="relative z-10 w-full max-w-4xl h-80 flex flex-col items-center justify-end">
+    <div className="relative w-full h-full flex flex-col items-center justify-center pt-8 overflow-hidden">
+      
+      {/* 3D-STYLED CHARACTER WORKSPACE */}
+      <div className="relative flex flex-col items-center">
         
-        {/* CHARACTER ILLUSTRATION */}
+        {/* Callout Speech Bubble - Realistic 3D floating effect */}
+        <div className={cn(
+          "absolute -top-24 left-1/2 -translate-x-1/2 z-30 transition-all duration-700",
+          "animate-float shadow-2xl"
+        )}>
+          <div className="relative bg-white text-background px-6 py-3 rounded-2xl font-black uppercase italic text-[10px] tracking-widest whitespace-nowrap border-4 border-background/10">
+            {getCalloutText()}
+            {/* Bubble Tail */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-background/10" />
+          </div>
+        </div>
+
+        {/* The Character SVG with 3D Gradients and Shading */}
         <div className={cn(
           "relative transition-all duration-1000", 
           isPreparing && "animate-bounce",
-          isDelivering && "animate-slide-in translate-x-[-20px]" // Fast lean for running
+          isDelivering && "animate-slide-in translate-x-[-10px]"
         )}>
-          {/* Subtle Glow */}
-          <div className="absolute -inset-10 bg-white/5 blur-[60px] rounded-full" />
-          
-          <svg viewBox="0 0 200 200" className={cn(
-            "w-64 h-64 drop-shadow-[0_10px_30px_rgba(0,0,0,0.2)]",
-            isDelivering && "animate-sway" // Fast Running effect
-          )}>
-            {/* Chef Hat */}
-            <path d="M80 45 Q 100 15 120 45" fill="white" stroke="white" strokeWidth="2" />
+          <svg viewBox="0 0 200 240" className="w-72 h-72 drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+            <defs>
+              <radialGradient id="gradHead" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#e5e7eb" />
+              </radialGradient>
+              <linearGradient id="gradBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#f3f4f6" />
+              </linearGradient>
+              <radialGradient id="gradChefHat" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#d1d5db" />
+              </radialGradient>
+              <filter id="shadow3d">
+                <feDropShadow dx="2" dy="2" stdDeviation="3" floodOpacity="0.2" />
+              </filter>
+            </defs>
+
+            {/* Chef Hat - 3D Volume */}
+            <g filter="url(#shadow3d)">
+              <ellipse cx="100" cy="30" rx="30" ry="15" fill="url(#gradChefHat)" />
+              <rect x="80" y="30" width="40" height="20" fill="url(#gradChefHat)" />
+            </g>
             
-            {/* Character Face */}
-            <circle cx="100" cy="70" r="30" fill="white" />
+            {/* Realistic 3D Head */}
+            <circle cx="100" cy="75" r="35" fill="url(#gradHead)" filter="url(#shadow3d)" />
             
-            {/* Dynamic Eyes/Expression */}
-            {isPending && (
-              <g className="opacity-40">
-                <path d="M85 70 L 95 70" stroke="#f38221" strokeWidth="2" strokeLinecap="round" />
-                <path d="M105 70 L 115 70" stroke="#f38221" strokeWidth="2" strokeLinecap="round" />
-                <path d="M95 85 Q 100 88 105 85" stroke="#f38221" strokeWidth="2" fill="none" />
+            {/* Realistic Eyes and Shading */}
+            {isPending ? (
+              <g className="opacity-60">
+                <path d="M85 75 Q 90 78 95 75" stroke="#f38221" strokeWidth="3" fill="none" strokeLinecap="round" />
+                <path d="M105 75 Q 110 78 115 75" stroke="#f38221" strokeWidth="3" fill="none" strokeLinecap="round" />
+                <path d="M95 90 Q 100 93 105 90" stroke="#f38221" strokeWidth="2" fill="none" />
               </g>
-            )}
-            
-            {(isPreparing || isDelivering) && (
+            ) : (
               <g>
-                {/* Waking Up / Joyful Eyes */}
-                <circle cx="88" cy="70" r="3" fill="#f38221" />
-                <circle cx="112" cy="70" r="3" fill="#f38221" />
-                <path d="M90 85 Q 100 95 110 85" stroke="#f38221" strokeWidth="2" fill="none" strokeLinecap="round" />
+                {/* 3D Weighted Eyes */}
+                <circle cx="88" cy="75" r="4" fill="#374151" />
+                <circle cx="112" cy="75" r="4" fill="#374151" />
+                <circle cx="86" cy="73" r="1.5" fill="white" />
+                <circle cx="110" cy="73" r="1.5" fill="white" />
+                {/* Cheeks */}
+                <circle cx="75" cy="85" r="5" fill="#fca5a5" opacity="0.3" />
+                <circle cx="125" cy="85" r="5" fill="#fca5a5" opacity="0.3" />
+                {/* Joyful Mouth */}
+                <path d="M90 92 Q 100 102 110 92" stroke="#f38221" strokeWidth="3" fill="none" strokeLinecap="round" />
               </g>
             )}
 
-            {/* Character Body */}
-            <path d="M65 170 Q 65 100 100 100 Q 135 100 135 170" fill="white" />
+            {/* Realistic 3D Torso */}
+            <path 
+              d="M60 180 Q 60 110 100 110 Q 140 110 140 180 Z" 
+              fill="url(#gradBody)" 
+              filter="url(#shadow3d)"
+            />
 
-            {/* Step 1: Sleeping Zzz Animation */}
+            {/* 3D Arms & Hands */}
+            <g className={cn(isPreparing && "animate-chop")}>
+               {/* Left Arm */}
+               <path d="M60 130 Q 40 140 40 160" stroke="white" strokeWidth="12" strokeLinecap="round" />
+               {/* Right Arm */}
+               <path d="M140 130 Q 160 140 160 160" stroke="white" strokeWidth="12" strokeLinecap="round" />
+            </g>
+
+            {/* State-Specific 3D Props */}
             {isPending && (
-              <g className="text-white/30 font-black italic">
-                <text x="130" y="40" fontSize="20" className="animate-zzz" style={{ animationDelay: '0s' }}>Z</text>
-                <text x="145" y="25" fontSize="14" className="animate-zzz" style={{ animationDelay: '1s' }}>z</text>
-                <text x="120" y="15" fontSize="10" className="animate-zzz" style={{ animationDelay: '2s' }}>z</text>
+              <g className="text-white/20 font-black italic">
+                <text x="140" y="50" fontSize="24" className="animate-zzz">Z</text>
+                <text x="155" y="30" fontSize="16" className="animate-zzz" style={{ animationDelay: '1s' }}>z</text>
+                <text x="130" y="20" fontSize="12" className="animate-zzz" style={{ animationDelay: '2s' }}>z</text>
               </g>
             )}
 
-            {/* Step 2: Joyful Preparation Action */}
             {isPreparing && (
-              <>
-                <g className="animate-chop origin-center">
-                  <rect x="40" y="110" width="30" height="10" rx="5" fill="white" />
-                  <rect x="130" y="110" width="30" height="10" rx="5" fill="white" />
-                </g>
-                <g className="text-white/40">
-                   <path d="M150 50 Q 155 40 160 50 T 170 50" fill="white" className="animate-steam" style={{ animationDelay: '0.2s' }} />
-                   <path d="M40 60 Q 45 50 50 60 T 60 60" fill="white" className="animate-steam" style={{ animationDelay: '0.8s' }} />
-                </g>
-              </>
+              <g filter="url(#shadow3d)">
+                {/* 3D Volumetric Steam */}
+                <path d="M160 80 Q 165 70 170 80" stroke="white" strokeWidth="2" opacity="0.4" className="animate-steam" />
+                <path d="M175 70 Q 180 60 185 70" stroke="white" strokeWidth="2" opacity="0.4" className="animate-steam" style={{ animationDelay: '0.5s' }}/>
+                {/* Pot/Utensil */}
+                <rect x="140" y="150" width="40" height="20" rx="5" fill="#9ca3af" />
+                <path d="M145 150 L 175 150" stroke="#4b5563" strokeWidth="2" />
+              </g>
             )}
 
-            {/* Step 3: Fast Running with Bag (Delivering) */}
             {isDelivering && (
               <g>
-                <circle cx="150" cy="140" r="40" fill="white" opacity="0.05" className="animate-pulse" />
+                {/* Running Legs 3D */}
+                <rect x="85" y="180" width="10" height="25" rx="5" fill="white" className="animate-sway" />
+                <rect x="115" y="180" width="10" height="25" rx="5" fill="white" className="animate-sway" style={{ animationDelay: '0.5s' }} />
+                
+                {/* Realistic 3D Packed Bag */}
                 <g className="animate-float" style={{ transform: 'translate(40px, 40px)' }}>
-                   <rect x="130" y="110" width="40" height="50" rx="8" fill="white" />
-                   <path d="M135 110 Q 150 80 165 110" stroke="white" strokeWidth="3" fill="none" />
-                   <circle cx="150" cy="135" r="6" fill="#f38221" />
+                   <rect x="135" y="120" width="45" height="55" rx="10" fill="#fef3c7" filter="url(#shadow3d)" />
+                   <path d="M140 120 Q 157 90 175 120" stroke="#d97706" strokeWidth="4" fill="none" />
+                   <circle cx="157" cy="147" r="8" fill="#f38221" />
                 </g>
-                {/* Running Legs */}
-                <rect x="80" y="160" width="8" height="20" rx="4" fill="white" className="animate-sway" />
-                <rect x="112" y="160" width="8" height="20" rx="4" fill="white" className="animate-sway" style={{ animationDelay: '0.5s' }} />
               </g>
             )}
           </svg>
-
-          {/* Heart for Delivery */}
-          {isDelivering && (
-            <div className="absolute top-0 right-0 animate-bounce">
-              <Heart size={32} className="text-white fill-white" />
-            </div>
-          )}
         </div>
-
-        {/* STATUS LABEL */}
-        <div className="mt-6 flex flex-col items-center gap-3">
-          <div className="flex items-center gap-3 bg-white/5 px-8 py-4 rounded-[2rem] border border-white/10 backdrop-blur-md">
-            {isPending && (
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
-                Waiting for the farm to wake up...
-              </span>
-            )}
-            {isPreparing && (
-              <div className="flex items-center gap-3">
-                <Utensils size={16} className="text-white animate-bounce" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
-                  Preparing with Love
-                </span>
-              </div>
-            )}
-            {status === 'Ready' && (
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-3">
-                  <Sparkles size={16} className="text-amber-300 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
-                    The Harvest is Ready!
-                  </span>
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">
-                  Please collect your food at the counter
-                </span>
-              </div>
-            )}
-            {(status === 'Handover' || status === 'Completed') && (
-              <div className="flex items-center gap-3">
-                <Heart size={16} className="text-rose-400 fill-rose-400 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">
-                  Handing over with Love
-                </span>
-              </div>
-            )}
-          </div>
-          <p className="text-[8px] font-bold uppercase tracking-[0.6em] text-white/10 italic">
-            Vaaradhi Boutique Kitchen
-          </p>
-        </div>
-
       </div>
     </div>
   );
