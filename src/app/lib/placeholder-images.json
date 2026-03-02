@@ -33,5 +33,19 @@
       "title": "Upgrade to Gold Class",
       "hint": "cinema luxury"
     }
+  ],
+  "landing": [
+    {
+      "id": "dine_in_character",
+      "url": "https://picsum.photos/seed/dine_in_art/600/600",
+      "title": "Dine In Experience",
+      "hint": "restaurant illustration"
+    },
+    {
+      "id": "takeaway_character",
+      "url": "https://picsum.photos/seed/takeaway_art/600/600",
+      "title": "Takeaway Experience",
+      "hint": "delivery illustration"
+    }
   ]
 }

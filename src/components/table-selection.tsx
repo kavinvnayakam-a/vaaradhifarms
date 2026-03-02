@@ -1,8 +1,10 @@
+
 "use client";
 
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import { ShoppingBag, Utensils, ArrowRight, Sparkles } from "lucide-react";
+import placeholderData from '@/app/lib/placeholder-images.json';
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -13,6 +15,9 @@ export default function TableSelection() {
     router.push(`/?table=${mode}`);
   };
 
+  const dineInImg = placeholderData.landing.find(i => i.id === 'dine_in_character');
+  const takeawayImg = placeholderData.landing.find(i => i.id === 'takeaway_character');
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
       {/* Immersive Background Elements */}
@@ -22,7 +27,7 @@ export default function TableSelection() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/canvas.png')] opacity-20" />
       </div>
 
-      <div className="w-full max-w-4xl space-y-16 text-center relative z-20">
+      <div className="w-full max-w-5xl space-y-16 text-center relative z-20">
         
         {/* Branding Section */}
         <div className="flex flex-col items-center gap-8 animate-in fade-in slide-in-from-top-10 duration-1000">
@@ -53,19 +58,34 @@ export default function TableSelection() {
         </div>
 
         {/* Selection Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
           
           {/* Dine-In Card */}
           <button 
             onClick={() => handleSelect('DineIn')}
-            className="group relative bg-white/10 backdrop-blur-3xl p-12 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left"
+            className="group relative bg-white/10 backdrop-blur-3xl p-8 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left overflow-hidden"
           >
-            <div className="flex flex-col h-full justify-between gap-12">
-              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl group-hover:bg-background transition-colors duration-500">
-                <Utensils size={36} className="text-background group-hover:text-white transition-colors" />
+            <div className="flex flex-col h-full gap-8 relative z-10">
+              {/* Illustration Character */}
+              <div className="relative h-48 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500">
+                {dineInImg && (
+                  <Image 
+                    src={dineInImg.url} 
+                    alt={dineInImg.title} 
+                    fill 
+                    className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" 
+                    data-ai-hint={dineInImg.hint}
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute top-4 left-4">
+                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:bg-background transition-colors duration-500">
+                    <Utensils size={24} className="text-background group-hover:text-white transition-colors" />
+                  </div>
+                </div>
               </div>
               
-              <div>
+              <div className="px-4 pb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <p className="text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-background/40">Available Now</p>
@@ -76,7 +96,8 @@ export default function TableSelection() {
                 </p>
               </div>
             </div>
-            <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
+            
+            <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0 z-20">
               <ArrowRight size={24} className="text-background" />
             </div>
           </button>
@@ -84,14 +105,29 @@ export default function TableSelection() {
           {/* Takeaway Card */}
           <button 
             onClick={() => handleSelect('Takeaway')}
-            className="group relative bg-white/10 backdrop-blur-3xl p-12 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left"
+            className="group relative bg-white/10 backdrop-blur-3xl p-8 rounded-[4rem] border-2 border-white/20 hover:bg-white hover:border-white transition-all duration-700 hover:scale-[1.05] hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)] text-left overflow-hidden"
           >
-            <div className="flex flex-col h-full justify-between gap-12">
-              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl group-hover:bg-background transition-colors duration-500">
-                <ShoppingBag size={36} className="text-background group-hover:text-white transition-colors" />
+            <div className="flex flex-col h-full gap-8 relative z-10">
+              {/* Illustration Character */}
+              <div className="relative h-48 w-full rounded-[2.5rem] overflow-hidden bg-white/5 group-hover:bg-background/5 transition-colors duration-500">
+                {takeawayImg && (
+                  <Image 
+                    src={takeawayImg.url} 
+                    alt={takeawayImg.title} 
+                    fill 
+                    className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" 
+                    data-ai-hint={takeawayImg.hint}
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute top-4 left-4">
+                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:bg-background transition-colors duration-500">
+                    <ShoppingBag size={24} className="text-background group-hover:text-white transition-colors" />
+                  </div>
+                </div>
               </div>
               
-              <div>
+              <div className="px-4 pb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles size={12} className="text-amber-300" />
                   <p className="text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-background/40">Fast Pickup</p>
@@ -102,7 +138,8 @@ export default function TableSelection() {
                 </p>
               </div>
             </div>
-            <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
+            
+            <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0 z-20">
               <ArrowRight size={24} className="text-background" />
             </div>
           </button>
