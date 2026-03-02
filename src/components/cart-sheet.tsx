@@ -6,7 +6,7 @@ import { useCart } from "@/hooks/use-cart";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingBag, Loader2, ImageIcon, CreditCard, Banknote, Smartphone } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Loader2, ImageIcon, CreditCard, Banknote, Smartphone, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFirestore } from "@/firebase";

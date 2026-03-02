@@ -9,7 +9,7 @@ import { MenuItemCard } from '@/components/menu-item-card';
 import { CartSheet } from '@/components/cart-sheet';
 import { CartIcon } from '@/components/cart-icon';
 import type { MenuItem } from '@/lib/types';
-import { ArrowUp, ChevronRight } from 'lucide-react';
+import { ArrowUp, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
@@ -46,16 +46,17 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       
       // Determine active category based on scroll position
       const categories = Object.keys(categoryRefs.current);
+      let currentActive = categories[0];
       for (const cat of categories) {
         const element = categoryRefs.current[cat];
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top >= 0 && rect.top <= 200) {
-            setActiveCategory(cat);
-            break;
+          if (rect.top <= 200) {
+            currentActive = cat;
           }
         }
       }
+      setActiveCategory(currentActive);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -87,7 +88,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const scrollToCategory = (category: string) => {
     const element = categoryRefs.current[category];
     if (element) {
-      const offset = 140; // Account for sticky header + nav
+      const offset = 180; // Adjusted for sticky header + refined nav height
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -106,63 +107,70 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
       
-      {/* Category Navigation Bar */}
-      <nav className="sticky top-[113px] z-40 w-full bg-background/80 backdrop-blur-md border-b border-white/5 py-4 overflow-x-auto custom-scrollbar">
-        <div className="container mx-auto px-6 flex items-center gap-4 min-w-max">
+      {/* Refined Category Navigation Bar */}
+      <nav className="sticky top-[113px] z-40 w-full bg-background/90 backdrop-blur-xl border-b border-white/10 py-6 overflow-x-auto custom-scrollbar shadow-xl">
+        <div className="container mx-auto px-6 flex items-center gap-6 min-w-max">
           {categorizedMenu.map(({ category }) => (
             <button
               key={category}
               onClick={() => scrollToCategory(category)}
               className={cn(
-                "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
+                "group relative px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-3",
                 activeCategory === category 
-                  ? "bg-primary text-white shadow-xl scale-105" 
-                  : "bg-white/10 text-white/60 hover:bg-white/20"
+                  ? "bg-white text-background shadow-[0_15px_30px_rgba(0,0,0,0.2)] scale-105" 
+                  : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white"
               )}
             >
+              {activeCategory === category && <Sparkles size={12} className="text-background animate-pulse" />}
               {category}
+              {activeCategory === category && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full translate-y-4" />
+              )}
             </button>
           ))}
         </div>
       </nav>
 
       <main className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
-        <div className="mb-20 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full border border-white/10">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white">Purely Authentic</p>
+        <div className="mb-24 text-center space-y-6">
+          <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/10 rounded-full border border-white/10 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Live Harvest Menu</p>
           </div>
-          <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none drop-shadow-2xl">
-            Vaaradhi <span className="text-primary-foreground">Menu</span>
+          <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-[0.9] drop-shadow-2xl">
+            Vaaradhi <br /> <span className="text-white/20">Farms.</span>
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6em] text-white/40 max-w-xs mx-auto">
-            Harvested with love, served with tradition.
-          </p>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.8em] text-white/40 max-w-xs mx-auto">
+              Authentic Boutique Experience
+            </p>
+            <div className="h-px w-16 bg-white/10" />
+          </div>
         </div>
 
-        <div className="space-y-40">
+        <div className="space-y-48">
           {categorizedMenu.map(({ category, items }) => (
             <section 
               key={category} 
               id={category} 
               ref={el => { categoryRefs.current[category] = el; }}
-              className="scroll-mt-48"
+              className="scroll-mt-56"
             >
-              <div className="flex flex-col gap-6 mb-16 relative">
-                <div className="absolute -left-10 top-1/2 -translate-y-1/2 w-4 h-24 bg-white/5 blur-xl" />
-                <div className="flex items-center gap-8">
-                    <h3 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-white">
+              <div className="flex flex-col gap-8 mb-20 relative">
+                <div className="absolute -left-12 top-1/2 -translate-y-1/2 w-6 h-32 bg-white/10 blur-2xl rounded-full" />
+                <div className="flex items-end gap-10">
+                    <h3 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-white leading-none">
                       {category}
                     </h3>
-                    <div className="h-[2px] flex-1 bg-gradient-to-r from-white/20 via-white/5 to-transparent" />
-                    <div className="flex items-center gap-2 text-white/20 group cursor-default">
-                      <span className="text-[10px] font-black uppercase tracking-widest">{items.length} Items</span>
-                      <ChevronRight size={16} />
+                    <div className="h-[2px] flex-1 bg-gradient-to-r from-white/20 via-white/5 to-transparent mb-2" />
+                    <div className="flex items-center gap-3 text-white/30 group cursor-default mb-1">
+                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">{items.length} Options</span>
+                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </div>
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14">
                 {items.map((item) => (
                   <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
                 ))}
@@ -172,21 +180,27 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         </div>
       </main>
 
-      <footer className="bg-primary py-40 px-6 border-t border-white/10">
-        <div className="max-w-5xl mx-auto flex flex-col items-center gap-16">
+      <footer className="bg-background py-48 px-6 border-t border-white/5">
+        <div className="max-w-5xl mx-auto flex flex-col items-center gap-20">
           <div className="relative group">
-            <div className="absolute inset-0 bg-white/20 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all" />
-            <div className="relative bg-white px-10 py-5 rounded-[2.5rem] shadow-2xl border-4 border-background/20 transform transition-transform hover:scale-105 duration-500">
-              <img src="https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa" alt="Vaaradhi Farms Logo" className="h-[80px] object-contain" />
+            <div className="absolute inset-0 bg-white/20 rounded-[2.5rem] blur-3xl group-hover:blur-[4rem] transition-all duration-700" />
+            <div className="relative bg-white px-12 py-6 rounded-[3rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border-4 border-white/30 transform transition-transform hover:scale-105 duration-700">
+              <img src="https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa" alt="Vaaradhi Farms Logo" className="h-[100px] object-contain" />
             </div>
           </div>
           
-          <div className="text-center space-y-10 text-white">
-             <div className="space-y-3">
-                <p className="text-[11px] font-black uppercase tracking-[0.8em] text-white/60">Authentic Farm Dining</p>
-                <div className="h-px w-24 bg-white/10 mx-auto" />
+          <div className="text-center space-y-12 text-white">
+             <div className="space-y-4">
+                <p className="text-[12px] font-black uppercase tracking-[1em] text-white/60">The Boutique Farm Experience</p>
+                <div className="h-[2px] w-32 bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto" />
              </div>
-             <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 hover:text-white/40 transition-colors">Digital Architecture By GetPik</p>
+             <div className="flex flex-col items-center gap-4 opacity-30 hover:opacity-100 transition-opacity duration-700 cursor-default">
+                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white">Digital Architecture By GetPik</p>
+                <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                   <span className="text-[8px] font-bold uppercase tracking-[0.2em]">Secure POS Environment</span>
+                </div>
+             </div>
           </div>
         </div>
       </footer>
@@ -197,11 +211,11 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={cn(
-          "fixed bottom-32 right-10 z-50 p-6 bg-white text-primary rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 hover:scale-110 active:scale-95",
+          "fixed bottom-32 right-10 z-50 p-7 bg-white text-background rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-all duration-700 hover:scale-110 active:scale-95 border-2 border-white/20",
           showBackToTop ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
         )}
       >
-        <ArrowUp size={28} strokeWidth={4} />
+        <ArrowUp size={32} strokeWidth={4} />
       </button>
     </div>
   );
