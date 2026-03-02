@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -80,28 +81,15 @@ export default function MenuManager() {
 
   const handleUpdatePrice = async (itemId: string, newPrice: number) => {
     if (!firestore || isNaN(newPrice) || newPrice < 0) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Price",
-        description: "Please enter a valid positive number for the price.",
-      });
-      // Optionally, reset the input to the old value
+      toast({ variant: "destructive", title: "Invalid Price" });
       return;
     }
     const itemRef = doc(firestore, "menu_items", itemId);
     try {
       await updateDoc(itemRef, { price: newPrice });
-      toast({
-        title: "Price Updated",
-        description: `The price has been successfully set to ₹${newPrice}.`,
-      });
+      toast({ title: "Price Updated" });
     } catch (err) {
-      console.error("Price update failed:", err);
-      toast({
-        variant: "destructive",
-        title: "Update Failed",
-        description: "Could not save the new price.",
-      });
+      toast({ variant: "destructive", title: "Update Failed" });
     }
   };
 
@@ -113,14 +101,13 @@ export default function MenuManager() {
 
   const handleRemoveImage = async (itemId: string) => {
     if (!firestore) return;
-    if (!confirm("Remove this image? The item will stay on the menu.")) return;
+    if (!confirm("Remove this image?")) return;
     try {
       const itemRef = doc(firestore, "menu_items", itemId);
       await updateDoc(itemRef, { image: "", showImage: false });
       toast({ title: "Image Removed" });
     } catch (err) {
-      console.error("Error removing image:", err);
-      toast({ variant: "destructive", title: "Error", description: "Failed to remove image." });
+      toast({ variant: "destructive", title: "Error" });
     }
   };
 
@@ -135,8 +122,7 @@ export default function MenuManager() {
         toast({ title: "Image Updated" });
       }
     } catch (err) {
-      console.error("Error updating image:", err);
-      toast({ variant: "destructive", title: "Upload Failed", description: "Verify Storage permissions." });
+      toast({ variant: "destructive", title: "Upload Failed" });
     } finally { setIsUploading(false); }
   };
 
@@ -162,159 +148,171 @@ export default function MenuManager() {
       });
       setFile(null);
       (e.target as HTMLFormElement).reset();
-      toast({ title: "Item Added", description: "The new treat is live on the menu." });
+      toast({ title: "Item Added" });
     } catch (err) {
-      console.error("Error adding item:", err);
-      toast({ variant: "destructive", title: "Add Failed", description: "Check Storage and Firestore permissions." });
+      toast({ variant: "destructive", title: "Add Failed" });
     } finally { setIsUploading(false); }
   };
 
   return (
-    <div className="space-y-8 p-2">
-      {/* MASTER IMAGE CONTROL PANEL */}
-      <section className="bg-amber-50 border-4 border-stone-800 p-6 rounded-[2rem] shadow-[8px_8px_0_0_#000] flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="space-y-8 animate-in fade-in duration-700">
+      {/* MASTER CONTROL */}
+      <section className="bg-background/5 border border-background/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
         <div>
-          <h2 className="text-xl font-black uppercase italic">Master Image Display</h2>
-          <p className="text-xs font-bold text-stone-500 uppercase">Turn off all images on customer website instantly</p>
+          <h2 className="text-2xl font-black uppercase italic tracking-tight text-background">Master Display Control</h2>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Globally toggle images on customer view</p>
         </div>
         <Button 
           onClick={toggleGlobalImages}
-          className={`h-12 px-8 rounded-2xl font-black uppercase italic border-2 transition-all ${
+          className={cn(
+            "h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all duration-500",
             globalShowImages 
-            ? "bg-emerald-500 text-white border-stone-800 shadow-[4px_4px_0_0_#000] hover:bg-emerald-600 active:translate-y-1" 
-            : "bg-stone-200 text-stone-500 border-stone-300"
-          }`}
+              ? "bg-background text-white shadow-xl shadow-background/20" 
+              : "bg-zinc-100 text-zinc-400"
+          )}
         >
-          {globalShowImages ? "All Images: Visible" : "All Images: Hidden"}
+          {globalShowImages ? "All Images Visible" : "All Images Hidden"}
         </Button>
       </section>
 
-      {/* ADD ITEM SECTION */}
-      <section className="bg-white border-4 border-stone-800 p-6 rounded-[2rem] shadow-[8px_8px_0_0_#000]">
-        <h2 className="text-xl font-black uppercase italic mb-6 flex items-center gap-2">
-          <Plus className="w-6 h-6" /> Add New Menu Item
+      {/* ADD ITEM */}
+      <section className="bg-white border border-zinc-100 p-8 rounded-[2.5rem] shadow-xl">
+        <h2 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3 text-zinc-900">
+          <Plus className="w-6 h-6 text-background" /> New Menu Selection
         </h2>
-        <form onSubmit={handleAddItem} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
-          <Input name="name" placeholder="Item Name" required className="border-2 border-stone-800 rounded-xl" />
-          <Input name="price" type="number" placeholder="Price (₹)" required className="border-2 border-stone-800 rounded-xl" />
-          <Input name="category" placeholder="Category" required className="border-2 border-stone-800 rounded-xl" />
-          
-          <Input name="description" placeholder="Short Description" className="border-2 border-stone-800 rounded-xl" />
-          
-          <div className="relative">
-            <label className="flex items-center justify-center w-full h-10 border-2 border-dashed border-stone-300 rounded-xl cursor-pointer hover:bg-stone-50 transition-all">
-              <Camera className="w-4 h-4 mr-2" />
-              <span className="text-[10px] font-bold uppercase">{file ? "Ready" : "Upload Photo"}</span>
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-            </label>
+        <form onSubmit={handleAddItem} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 items-end">
+          <div className="space-y-2">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 ml-1">Item Name</label>
+            <Input name="name" placeholder="e.g. Farm Fresh Pizza" required className="h-12 bg-zinc-50 border-zinc-100 rounded-xl font-bold" />
           </div>
+          <div className="space-y-2">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 ml-1">Price (₹)</label>
+            <Input name="price" type="number" placeholder="Price" required className="h-12 bg-zinc-50 border-zinc-100 rounded-xl font-bold" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 ml-1">Category</label>
+            <Input name="category" placeholder="Category" required className="h-12 bg-zinc-50 border-zinc-100 rounded-xl font-bold" />
+          </div>
+          <div className="space-y-2 lg:col-span-2 xl:col-span-1">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 ml-1">Description</label>
+            <Input name="description" placeholder="Brief details..." className="h-12 bg-zinc-50 border-zinc-100 rounded-xl font-bold" />
+          </div>
+          
+          <label className="flex items-center justify-center h-12 border-2 border-dashed border-zinc-200 rounded-xl cursor-pointer hover:bg-zinc-50 transition-all text-zinc-400 hover:text-background">
+            <Camera className="w-4 h-4 mr-2" />
+            <span className="text-[10px] font-bold uppercase">{file ? "Ready" : "Photo"}</span>
+            <input type="file" className="hidden" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+          </label>
 
-          <Button disabled={isUploading} className="bg-stone-800 text-white hover:bg-amber-500 hover:text-stone-800 font-black uppercase italic h-10 rounded-xl">
-            {isUploading ? <Loader2 className="animate-spin" /> : "Save to Cloud"}
+          <Button disabled={isUploading} className="h-12 bg-background text-white hover:bg-zinc-900 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-background/20">
+            {isUploading ? <Loader2 className="animate-spin" /> : "Publish Item"}
           </Button>
         </form>
       </section>
 
-      {/* MENU TABLE */}
-      <div className="bg-white border-4 border-stone-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
-        <table className="w-full text-left">
-          <thead className="bg-stone-800 text-white text-[10px] font-black uppercase tracking-[0.2em]">
-            <tr>
-              <th className="p-6">Item & Image</th>
-              <th className="p-6">Description</th>
-              <th className="p-6">Visibility</th>
-              <th className="p-6">Price</th>
-              <th className="p-6">Stock Status</th>
-              <th className="p-6 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y-2 divide-stone-100">
-            {items.map((item) => (
-              <tr key={item.id} className={`group transition-opacity ${!item.available ? "bg-stone-50 opacity-60" : ""}`}>
-                <td className="p-4 flex items-center gap-4">
-                  <div className={`relative w-20 h-20 shrink-0 transition-all ${item.showImage === false ? "grayscale opacity-40" : ""}`}>
-                    <div className="w-full h-full rounded-2xl bg-stone-100 border-2 border-stone-800 overflow-hidden shadow-sm relative">
-                      {item.image ? (
-                        <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-stone-300">
-                          <ImageIcon size={24} />
-                        </div>
-                      )}
-                      <label className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 hover:opacity-100 cursor-pointer transition-opacity z-10">
-                        <RefreshCw size={20} className={isUploading ? "animate-spin" : ""} />
-                        <span className="text-[8px] font-bold uppercase mt-1">Swap</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                          const newFile = e.target.files?.[0];
-                          if (newFile) handleUpdateImage(item.id, newFile);
-                        }} />
-                      </label>
-                    </div>
-                    {item.image && (
-                      <button onClick={(e) => { e.preventDefault(); handleRemoveImage(item.id); }} className="absolute -top-2 -right-2 bg-rose-500 text-white p-1.5 rounded-full border-2 border-white shadow-lg hover:scale-110 transition-all z-20">
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-black text-stone-800 uppercase italic leading-tight">{item.name}</p>
-                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{item.category}</p>
-                  </div>
-                </td>
-
-                <td className="p-4">
-                  <textarea 
-                    defaultValue={item.description}
-                    onBlur={(e) => handleUpdateDescription(item.id, e.target.value)}
-                    placeholder="Add details..."
-                    className="w-full bg-stone-50 text-[10px] font-bold p-2 rounded-xl border-none focus:ring-2 ring-amber-500 resize-none h-16 outline-none"
-                  />
-                </td>
-
-                <td className="p-4">
-                  <button
-                    disabled={!item.image}
-                    onClick={() => toggleImageVisibility(item)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 transition-all font-black text-[9px] uppercase ${
-                      !item.image 
-                        ? "border-stone-100 text-stone-200 cursor-not-allowed"
-                        : item.showImage !== false 
-                        ? "border-amber-500 bg-amber-50 text-amber-600 shadow-[2px_2px_0_0_#d97706]" 
-                        : "border-stone-300 bg-stone-100 text-stone-500"
-                    }`}
-                  >
-                    {item.showImage !== false ? <Eye size={14} /> : <EyeOff size={14} />}
-                    {item.showImage !== false ? "Shown" : "Hidden"}
-                  </button>
-                </td>
-
-                <td className="p-4">
-                  <div className="relative">
-                    <Coins className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
-                    <Input
-                      type="number"
-                      defaultValue={item.price}
-                      onBlur={(e) => handleUpdatePrice(item.id, Number(e.target.value))}
-                      className="w-28 pl-9 font-black text-lg text-white bg-stone-900 border-2 border-stone-700 rounded-xl focus:border-amber-500 focus:ring-amber-500"
-                    />
-                  </div>
-                </td>
-                
-                <td className="p-4">
-                  <button onClick={() => toggleStatus(item)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all border-2 ${item.available ? "bg-emerald-50 border-emerald-500 text-emerald-600" : "bg-rose-50 border-rose-500 text-rose-600"}`}>
-                    {item.available ? "In Stock" : "Sold Out"}
-                  </button>
-                </td>
-
-                <td className="p-4 text-right">
-                  <button onClick={async () => { if(confirm("Delete item permanently?")) { if (firestore) await deleteDoc(doc(firestore, "menu_items", item.id)) } }} className="p-3 bg-stone-50 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </td>
+      {/* ITEMS TABLE */}
+      <div className="bg-white border border-zinc-100 rounded-[3rem] overflow-hidden shadow-2xl">
+        <div className="p-8 border-b border-zinc-50 flex justify-between items-center">
+           <h3 className="text-xl font-black uppercase italic tracking-tighter text-zinc-900">Menu Registry</h3>
+           <span className="px-4 py-1.5 bg-zinc-50 rounded-full text-[9px] font-black uppercase text-zinc-400">{items.length} Total Items</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-zinc-50 text-zinc-400 text-[9px] font-black uppercase tracking-widest">
+              <tr>
+                <th className="px-8 py-5">Product Details</th>
+                <th className="px-8 py-5">Summary</th>
+                <th className="px-8 py-5">Visuals</th>
+                <th className="px-8 py-5">Price</th>
+                <th className="px-8 py-5">Inventory</th>
+                <th className="px-8 py-5 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-50">
+              {items.map((item) => (
+                <tr key={item.id} className={cn("group transition-colors hover:bg-zinc-50/50", !item.available && "opacity-60")}>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-5">
+                      <div className="relative w-16 h-16 shrink-0 rounded-2xl bg-zinc-50 border border-zinc-100 overflow-hidden group/img">
+                        {item.image ? (
+                          <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-zinc-200">
+                            <ImageIcon size={20} />
+                          </div>
+                        )}
+                        <label className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center text-white opacity-0 group-hover/img:opacity-100 cursor-pointer transition-opacity z-10">
+                          <RefreshCw size={16} className={isUploading ? "animate-spin" : ""} />
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                            const newFile = e.target.files?.[0];
+                            if (newFile) handleUpdateImage(item.id, newFile);
+                          }} />
+                        </label>
+                      </div>
+                      <div>
+                        <p className="font-black text-zinc-900 uppercase italic leading-none">{item.name}</p>
+                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1.5">{item.category}</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-8 py-6 max-w-xs">
+                    <textarea 
+                      defaultValue={item.description}
+                      onBlur={(e) => handleUpdateDescription(item.id, e.target.value)}
+                      className="w-full bg-transparent text-[10px] font-bold text-zinc-500 border-none focus:ring-0 resize-none h-12 custom-scrollbar outline-none italic"
+                    />
+                  </td>
+
+                  <td className="px-8 py-6">
+                    <button
+                      disabled={!item.image}
+                      onClick={() => toggleImageVisibility(item)}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-xl border transition-all font-black text-[9px] uppercase tracking-widest",
+                        !item.image 
+                          ? "border-zinc-100 text-zinc-200 cursor-not-allowed"
+                          : item.showImage !== false 
+                          ? "border-background/20 bg-background/5 text-background" 
+                          : "border-zinc-200 bg-zinc-50 text-zinc-400"
+                      )}
+                    >
+                      {item.showImage !== false ? <Eye size={12} /> : <EyeOff size={12} />}
+                      {item.showImage !== false ? "Public" : "Hidden"}
+                    </button>
+                  </td>
+
+                  <td className="px-8 py-6">
+                    <div className="relative w-28">
+                      <Coins className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-300 pointer-events-none" />
+                      <input
+                        type="number"
+                        defaultValue={item.price}
+                        onBlur={(e) => handleUpdatePrice(item.id, Number(e.target.value))}
+                        className="w-full pl-9 pr-3 py-2 font-black text-zinc-900 bg-zinc-50 border border-zinc-100 rounded-xl focus:border-background focus:ring-0 transition-colors outline-none text-sm"
+                      />
+                    </div>
+                  </td>
+                  
+                  <td className="px-8 py-6">
+                    <button onClick={() => toggleStatus(item)} className={cn(
+                      "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+                      item.available ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-rose-50 text-rose-600 border border-rose-100"
+                    )}>
+                      {item.available ? "In Stock" : "Sold Out"}
+                    </button>
+                  </td>
+
+                  <td className="px-8 py-6 text-right">
+                    <button onClick={async () => { if(confirm("Delete item?")) { if (firestore) await deleteDoc(doc(firestore, "menu_items", item.id)) } }} className="p-3 text-zinc-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

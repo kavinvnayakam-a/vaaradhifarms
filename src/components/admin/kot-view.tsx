@@ -5,18 +5,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { 
   collection, onSnapshot, query, orderBy, doc, 
-  updateDoc, writeBatch, serverTimestamp, getDoc, getDocs, where, Timestamp 
+  updateDoc, writeBatch, serverTimestamp, getDoc
 } from 'firebase/firestore';
 import { Order, Table as TableType } from '@/lib/types';
 import { 
-  CheckCircle2, Clock, Check, ChefHat, User, Hash, Box, PackageCheck, Handshake, History, Flame
+  CheckCircle2, Clock, ChefHat, Hash, Box, PackageCheck, Handshake, History, Flame
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 export default function KotView() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [tables, setTables] = useState<TableType[]>([]);
   const [isCleaning, setIsCleaning] = useState(false);
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -29,14 +28,7 @@ export default function KotView() {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
     });
 
-    const unsubTables = onSnapshot(query(collection(firestore, "tables"), orderBy("tableNumber")), (snapshot) => {
-        setTables(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as TableType));
-    });
-
-    return () => {
-      unsubOrders();
-      unsubTables();
-    };
+    return () => unsubOrders();
   }, [firestore]);
 
   useEffect(() => {
@@ -47,11 +39,8 @@ export default function KotView() {
       try {
         const now = new Date();
         const cutoff = new Date();
-        cutoff.setHours(23, 0, 0, 0); // 11:00 PM cutoff
-        
-        if (now < cutoff) {
-          cutoff.setDate(cutoff.getDate() - 1);
-        }
+        cutoff.setHours(23, 0, 0, 0); 
+        if (now < cutoff) cutoff.setDate(cutoff.getDate() - 1);
 
         const expiredOrders = orders.filter(order => {
           const orderDate = order.timestamp?.seconds 
@@ -61,27 +50,15 @@ export default function KotView() {
         });
 
         if (expiredOrders.length > 0) {
-          console.log(`🧹 Auto-Archive: Moving ${expiredOrders.length} stale orders to history...`);
           const batch = writeBatch(firestore);
-          
           expiredOrders.forEach(order => {
             const historyRef = doc(collection(firestore, "order_history"));
             const orderRef = doc(firestore, "orders", order.id);
-            
-            batch.set(historyRef, { 
-              ...order, 
-              status: "Completed",
-              archivedAt: serverTimestamp(),
-              archiveReason: "Daily 11PM Auto-Archive"
-            });
+            batch.set(historyRef, { ...order, status: "Completed", archivedAt: serverTimestamp() });
             batch.delete(orderRef);
           });
-
           await batch.commit();
-          toast({ 
-            title: "Daily Archive Complete", 
-            description: `Archived ${expiredOrders.length} orders from the day.` 
-          });
+          toast({ title: "Daily Archive Complete" });
         }
       } catch (err) {
         console.error("Auto-archive failure:", err);
@@ -89,7 +66,6 @@ export default function KotView() {
         setIsCleaning(false);
       }
     };
-
     performAutoArchive();
   }, [firestore, orders, isCleaning, toast]);
 
@@ -112,13 +88,13 @@ export default function KotView() {
   const markReadyForPickup = async (orderId: string) => {
     if (!firestore) return;
     await updateDoc(doc(firestore, "orders", orderId), { status: "Ready" });
-    toast({ title: "Ready for Pickup", description: "Customer notified." });
+    toast({ title: "Ready for Pickup" });
   };
 
   const markHandover = async (orderId: string) => {
     if (!firestore) return;
     await updateDoc(doc(firestore, "orders", orderId), { status: "Handover" });
-    toast({ title: "Order Handovered", description: "Moved to handover section." });
+    toast({ title: "Order Handovered" });
   };
 
   const formatOrderTime = (ts: any) => {
@@ -135,61 +111,59 @@ export default function KotView() {
   }, [orders]);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-primary p-4 rounded-3xl shadow-lg shadow-primary/20 text-white">
-            <Box size={32} />
+        <div className="flex items-center gap-6">
+          <div className="bg-background p-4 rounded-3xl shadow-lg shadow-background/20 text-white">
+            <ChefHat size={32} />
           </div>
           <div>
             <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter">Kitchen Workspace</h3>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-              Shift resets at 11:00 PM • {preparationQueue.length + handoverQueue.length} Active Tickets
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
+              {preparationQueue.length + handoverQueue.length} Active Tickets
             </p>
           </div>
         </div>
         
         <div className="flex gap-4">
-          <div className="bg-white border border-zinc-200 rounded-3xl px-6 py-4 shadow-sm flex items-center gap-4">
-              <span className="text-3xl font-black text-orange-500 italic leading-none">{preparationQueue.length}</span>
-              <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Preparing</span>
+          <div className="bg-white border border-zinc-100 rounded-3xl px-8 py-4 shadow-sm flex items-center gap-6">
+              <span className="text-4xl font-black text-background italic leading-none">{preparationQueue.length}</span>
+              <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Current<br/>Preparation</span>
           </div>
-          <div className="bg-white border border-zinc-200 rounded-3xl px-6 py-4 shadow-sm flex items-center gap-4">
-              <span className="text-3xl font-black text-primary italic leading-none">{handoverQueue.length}</span>
-              <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Handed Over</span>
+          <div className="bg-white border border-zinc-100 rounded-3xl px-8 py-4 shadow-sm flex items-center gap-6">
+              <span className="text-4xl font-black text-zinc-200 italic leading-none">{handoverQueue.length}</span>
+              <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Recently<br/>Handed Over</span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        <div className="lg:col-span-8 space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-             <Flame className="text-orange-500" size={20} />
-             <h4 className="text-xl font-black uppercase italic text-zinc-900 tracking-tight">Active Preparation</h4>
+        <div className="lg:col-span-8 space-y-8">
+          <div className="flex items-center gap-3 mb-2 px-2">
+             <Flame className="text-background" size={20} />
+             <h4 className="text-xl font-black uppercase italic text-zinc-900 tracking-tight">In Preparation</h4>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {preparationQueue.length > 0 ? preparationQueue.map((order) => (
               <OrderTicket 
                 key={order.id} 
                 order={order} 
-                tables={tables}
                 onPack={markItemPacked}
                 onReady={markReadyForPickup}
                 onHandover={markHandover}
                 formatTime={formatOrderTime}
               />
             )) : (
-              <EmptyState icon={<ChefHat size={48}/>} label="No pending orders" />
+              <EmptyState icon={<Box size={48}/>} label="Kitchen is clear" />
             )}
           </div>
         </div>
 
-        <div className="lg:col-span-4 space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-             <History className="text-zinc-400" size={20} />
-             <h4 className="text-xl font-black uppercase italic text-zinc-400 tracking-tight">Handed Over</h4>
+        <div className="lg:col-span-4 space-y-8">
+          <div className="flex items-center gap-3 mb-2 px-2">
+             <History className="text-zinc-300" size={20} />
+             <h4 className="text-xl font-black uppercase italic text-zinc-300 tracking-tight">Archives</h4>
           </div>
 
           <div className="flex flex-col gap-6">
@@ -197,43 +171,40 @@ export default function KotView() {
               <OrderTicket 
                 key={order.id} 
                 order={order}
-                tables={tables}
                 formatTime={formatOrderTime}
                 isHandover
               />
             )) : (
-              <div className="h-40 flex items-center justify-center border-4 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-200">
-                <p className="text-[10px] font-black uppercase tracking-widest">Awaiting Handovers</p>
+              <div className="h-40 flex items-center justify-center border-2 border-dashed border-zinc-100 rounded-[3rem] text-zinc-200">
+                <p className="text-[10px] font-black uppercase tracking-widest italic">No handovers recorded</p>
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>
   );
 }
 
-function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover, tables }: any) {
-  const table = tables.find((t: any) => t.id === order.tableId);
-  const identifier = table ? `Table ${table.tableNumber}` : `#${order.orderNumber}`;
-  const subIdentifier = order.tableId === 'Takeaway' ? 'Takeaway' : order.customerName;
+function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover }: any) {
+  const identifier = order.tableId === 'Takeaway' ? 'Collection' : `Dine-In`;
+  const subIdentifier = order.customerName;
 
   return (
     <div className={cn(
-      "bg-white border-2 rounded-[2.5rem] p-6 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
-      order.status === 'Ready' ? 'border-emerald-500/50' : 
-      isHandover ? 'border-primary bg-primary/5 opacity-80' : 
+      "bg-white border rounded-[3rem] p-8 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
+      order.status === 'Ready' ? 'border-emerald-500/30' : 
+      isHandover ? 'opacity-60 grayscale scale-[0.98]' : 
       'border-zinc-100'
     )}>
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
-           <div className="w-10 h-10 bg-zinc-50 rounded-2xl flex items-center justify-center border border-zinc-100">
-              <Hash size={16} className="text-primary" />
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex items-center gap-4">
+           <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center border border-zinc-100 group-hover:bg-background group-hover:text-white transition-colors duration-500">
+              <Hash size={18} />
            </div>
            <div>
-              <span className="text-xl font-black italic text-zinc-900">{identifier}</span>
-              <div className="flex items-center gap-2 text-zinc-400 text-[8px] font-bold uppercase">
+              <span className="text-2xl font-black italic text-zinc-900 leading-none">{order.orderNumber}</span>
+              <div className="flex items-center gap-2 text-zinc-400 text-[9px] font-bold uppercase tracking-widest mt-1">
                  <Clock size={10}/> {formatTime(order.timestamp)}
               </div>
            </div>
@@ -241,29 +212,32 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
         <StatusBadge status={order.status} />
       </div>
 
-      <div className="mb-4 flex items-center justify-between">
-         <span className="text-[9px] font-black uppercase text-zinc-500 truncate max-w-[120px]">{subIdentifier}</span>
-         <span className="text-[9px] font-black text-primary uppercase italic">{order.items.length} Items</span>
+      <div className="mb-6 flex items-center justify-between bg-zinc-50/50 p-4 rounded-2xl">
+         <span className="text-[10px] font-black uppercase text-zinc-500 truncate max-w-[140px] italic">{subIdentifier}</span>
+         <span className="px-3 py-1 bg-background/5 text-background text-[9px] font-black uppercase rounded-lg">{order.items.length} Items</span>
       </div>
 
-      <div className="space-y-2 flex-1 mb-6">
+      <div className="space-y-3 flex-1 mb-8">
         {order.items.map((item: any, idx: number) => (
           <div key={idx} className={cn(
-            "flex justify-between items-center p-3 rounded-xl border transition-all",
-            item.status === 'Served' ? 'bg-emerald-50 border-emerald-100 opacity-50' : 'bg-zinc-50 border-zinc-100'
+            "flex justify-between items-center p-4 rounded-2xl border transition-all",
+            item.status === 'Served' ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-zinc-50'
           )}>
-            <div className="flex items-center gap-2">
-              <span className="text-primary font-black italic text-[10px]">{item.quantity}x</span>
-              <span className={cn("text-[10px] font-bold uppercase italic truncate max-w-[140px]", item.status === 'Served' ? 'line-through text-zinc-400' : 'text-zinc-900')}>
+            <div className="flex items-center gap-3">
+              <span className="text-background font-black italic text-[11px]">{item.quantity}x</span>
+              <span className={cn("text-[11px] font-black uppercase italic truncate max-w-[160px]", item.status === 'Served' ? 'line-through text-zinc-300' : 'text-zinc-800')}>
                  {item.name}
               </span>
             </div>
             {!isHandover && item.status !== 'Served' && order.status !== 'Ready' && (
-              <button onClick={() => onPack(order.id, idx)} className="bg-primary text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase italic">
+              <button 
+                onClick={() => onPack(order.id, idx)} 
+                className="bg-zinc-900 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase italic hover:bg-background transition-colors"
+              >
                 Pack
               </button>
             )}
-            {item.status === 'Served' && <PackageCheck className="text-emerald-500" size={14} />}
+            {item.status === 'Served' && <PackageCheck className="text-emerald-500" size={16} />}
           </div>
         ))}
       </div>
@@ -276,20 +250,20 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
                 onClick={() => onReady(order.id)}
                 disabled={order.status !== 'Served'}
                 className={cn(
-                  "w-full py-4 rounded-2xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95",
+                  "w-full py-5 rounded-2xl font-black uppercase italic text-[11px] flex items-center justify-center gap-3 transition-all duration-500 active:scale-95",
                   order.status === 'Served' 
-                  ? "bg-emerald-500 text-white shadow-lg" 
-                  : "bg-zinc-100 text-zinc-300 cursor-not-allowed"
+                  ? "bg-emerald-500 text-white shadow-xl shadow-emerald-500/20" 
+                  : "bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100"
                 )}
               >
-                <CheckCircle2 size={16}/> Mark Ready
+                <CheckCircle2 size={18}/> Mark Ready
               </button>
             ) : (
               <button 
                 onClick={() => onHandover(order.id)} 
-                className="w-full py-4 bg-primary text-white rounded-2xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 shadow-lg"
+                className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase italic text-[11px] flex items-center justify-center gap-3 shadow-xl shadow-background/20 transition-all active:scale-95"
               >
-                <Handshake size={16}/> Handover
+                <Handshake size={18}/> Process Handover
               </button>
             )}
           </>
@@ -301,24 +275,24 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
 
 function StatusBadge({ status }: { status: string }) {
   const config: any = {
-    'Received': 'bg-blue-100 text-blue-600 border-blue-200',
-    'Preparing': 'bg-orange-100 text-orange-600 border-orange-200',
-    'Served': 'bg-emerald-100 text-emerald-600 border-emerald-200',
+    'Received': 'bg-blue-50 text-blue-600 border-blue-100',
+    'Preparing': 'bg-orange-50 text-orange-600 border-orange-100',
+    'Served': 'bg-emerald-50 text-emerald-600 border-emerald-100',
     'Ready': 'bg-emerald-500 text-white border-emerald-600',
-    'Handover': 'bg-primary text-white border-primary'
+    'Handover': 'bg-background text-white border-background'
   };
   return (
-    <span className={cn("px-3 py-1 rounded-full text-[8px] font-black uppercase border", config[status])}>
-      {status === 'Served' ? 'Packed' : status === 'Handover' ? 'Collected' : status}
+    <span className={cn("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border", config[status])}>
+      {status === 'Served' ? 'Packed' : status === 'Handover' ? 'Complete' : status}
     </span>
   );
 }
 
 function EmptyState({ icon, label }: any) {
   return (
-    <div className="col-span-full h-64 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-200">
-       <div className="opacity-20">{icon}</div>
-       <p className="text-[10px] font-black uppercase tracking-widest mt-2">{label}</p>
+    <div className="col-span-full h-64 flex flex-col items-center justify-center bg-zinc-50/50 border-4 border-dashed border-zinc-100 rounded-[4rem] text-zinc-200">
+       <div className="bg-white p-6 rounded-full shadow-md mb-4">{icon}</div>
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300 italic">{label}</p>
     </div>
   );
 }

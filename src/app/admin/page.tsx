@@ -1,7 +1,7 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MenuManager from "@/components/admin/menu-manager"; 
 import OrderManager from "@/components/admin/order-manager"; 
@@ -15,11 +15,9 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { 
   LogOut, 
-  Bell,
   Clock,
   TrendingUp,
   Settings,
-  ShieldCheck,
   ChefHat,
   Store,
   PanelLeft,
@@ -89,13 +87,14 @@ export default function AdminDashboard() {
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
 
-  if (!isAuthLoaded) return <div className="h-screen w-full flex items-center justify-center bg-background"><Loader2 className="animate-spin text-white" /></div>;
+  if (!isAuthLoaded) return <div className="h-screen w-full flex items-center justify-center bg-white"><Loader2 className="animate-spin text-background" /></div>;
   if (!auth) return null;
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-background text-white font-sans">
-        <Sidebar collapsible="icon" className="bg-primary text-white border-r border-white/10">
+      <div className="flex h-screen w-full bg-white text-zinc-900 font-sans">
+        {/* Sidebar - Vibrant Orange */}
+        <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center">
             <div className="bg-white px-4 py-2 rounded-xl shadow-xl">
               <Image src={LOGO_URL} alt="Vaaradhi Farms" width={120} height={52} className="object-contain" />
@@ -106,38 +105,51 @@ export default function AdminDashboard() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.id} className="mb-2">
-                  <SidebarMenuButton onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} isActive={activeTab === item.id} className={cn("flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-widest", activeTab === item.id ? "bg-white text-background" : "text-white/60 hover:bg-white/10")}>
+                  <SidebarMenuButton 
+                    onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} 
+                    isActive={activeTab === item.id} 
+                    className={cn(
+                      "flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300", 
+                      activeTab === item.id 
+                        ? "bg-white text-background shadow-lg" 
+                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span>{item.label}</span>
+                    {item.showBadge && (
+                      <span className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_white]" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="p-4 border-t border-white/10">
-            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full px-2 py-6">
+            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full px-4 py-6">
               <LogOut className="w-4 h-4" /> <span>Sign Out</span>
             </button>
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background">
-          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-white/10 px-8 py-6 flex items-center justify-between shadow-lg">
+        {/* Main Content - Pure White */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white">
+          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100 px-8 py-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-6">
-              <SidebarTrigger className="text-white"><PanelLeft size={24} /></SidebarTrigger>
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter">
+              <SidebarTrigger className="text-zinc-400 hover:text-background transition-colors"><PanelLeft size={24} /></SidebarTrigger>
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter text-zinc-900">
                 {activeTab.replace('_', ' ')}
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <div className="px-5 py-3 bg-white/10 rounded-2xl flex items-center gap-2 border border-white/10">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Live Console</span>
+              <div className="px-5 py-3 bg-background/5 rounded-2xl flex items-center gap-3 border border-background/10">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-background">System Live</span>
               </div>
             </div>
           </header>
           <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            <div className="max-w-7xl mx-auto pb-20">
+            <div className="max-w-7xl mx-auto pb-20 text-zinc-900">
               {activeTab === 'counter' && <OrderManager />}
               {activeTab === 'packing' && <KotView />}
               {activeTab === 'today_orders' && <TodayOrders />}
