@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -186,15 +185,15 @@ export default function TodayOrders() {
 
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-[75vw] rounded-[3rem] p-0 overflow-hidden bg-zinc-950 border-none shadow-2xl">
-          <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
+          <DialogHeader className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
              <div>
-                <h3 className="text-2xl font-black uppercase italic text-white flex items-center gap-3">
+                <DialogTitle className="text-2xl font-black uppercase italic text-white flex items-center gap-3">
                    <ReceiptText className="text-background" /> Reprint Console
-                </h3>
-                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Reviewing Token #{printingOrder?.orderNumber}</p>
+                </DialogTitle>
+                <DialogDescription className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Reviewing Token #{printingOrder?.orderNumber}</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-3 text-white/20 hover:text-white transition-colors"><X size={24} /></button>
-          </div>
+          </DialogHeader>
           
           <div className="p-12 bg-zinc-900/50 flex gap-10 overflow-x-auto justify-center items-start custom-scrollbar h-[60vh]">
             <div className="space-y-4">

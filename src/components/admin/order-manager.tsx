@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -218,6 +218,10 @@ export default function OrderManager() {
       {/* Manual Order Dialog */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="max-w-6xl rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>New Manual Order</DialogTitle>
+            <DialogDescription>Create a new order by selecting items from the menu.</DialogDescription>
+          </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 h-[80vh]">
             {/* Menu Selection */}
             <div className="md:col-span-7 bg-zinc-50 p-10 flex flex-col gap-8">
@@ -334,17 +338,17 @@ export default function OrderManager() {
       {/* Print Preview Dialog */}
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-[75vw] rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
-          <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
+          <DialogHeader className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
              <div>
-                <h3 className="text-2xl font-black uppercase italic text-white flex items-center gap-3">
+                <DialogTitle className="text-2xl font-black uppercase italic text-white flex items-center gap-3">
                    <Printer className="text-background" /> Thermal Preview
-                </h3>
-                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Verify layout before physical output</p>
+                </DialogTitle>
+                <DialogDescription className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Verify layout before physical output</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-3 text-white/20 hover:text-white transition-colors">
                 <X size={24} />
              </button>
-          </div>
+          </DialogHeader>
           
           <div className="p-12 flex gap-10 overflow-x-auto justify-center items-start custom-scrollbar">
             <div className="flex-shrink-0 space-y-4">
