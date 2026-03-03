@@ -46,11 +46,11 @@ const Template1 = ({ order, settings }: ReceiptProps) => (
           </div>
       </div>
       <div className="border-y border-dashed border-black py-1 my-2 text-[10px]">
-          <div className="flex justify-between">
+          <div className="flex justify-between w-full">
               <span>DATE: {formatDate(order.timestamp)}</span>
               <span>TIME: {formatTime(order.timestamp)}</span>
           </div>
-          <div className="flex justify-between font-black text-sm mt-1">
+          <div className="flex justify-between w-full font-black text-sm mt-1">
               <span>TOKEN: #{order.orderNumber}</span>
               <span>{order.tableId.toUpperCase()}</span>
           </div>
@@ -58,32 +58,32 @@ const Template1 = ({ order, settings }: ReceiptProps) => (
               <span className="uppercase">CUST: {order.customerName}</span>
           </div>
       </div>
-      <table className="w-full text-[10px]">
+      <table className="w-full text-[10px] border-collapse" style={{ tableLayout: 'fixed' }}>
           <thead>
               <tr className="border-b border-dashed border-black">
-                  <th className="text-left font-bold uppercase pb-1">ITEM</th>
-                  <th className="text-center font-bold uppercase pb-1">QTY</th>
-                  <th className="text-right font-bold uppercase pb-1">PRICE</th>
+                  <th className="text-left font-bold uppercase pb-1" style={{ width: '60%' }}>ITEM</th>
+                  <th className="text-center font-bold uppercase pb-1" style={{ width: '15%' }}>QTY</th>
+                  <th className="text-right font-bold uppercase pb-1" style={{ width: '25%' }}>PRICE</th>
               </tr>
           </thead>
           <tbody>
               {order?.items.map((item, idx) => (
                   <tr key={idx} className="font-bold">
-                      <td className="py-1 uppercase">{item.name}</td>
-                      <td className="text-center py-1">{item.quantity}</td>
-                      <td className="text-right py-1">{(item.price * item.quantity).toFixed(2)}</td>
+                      <td className="py-1 uppercase break-words">{item.name}</td>
+                      <td className="text-center py-1 vertical-top">{item.quantity}</td>
+                      <td className="text-right py-1 vertical-top">{(item.price * item.quantity).toFixed(2)}</td>
                   </tr>
               ))}
           </tbody>
       </table>
       <div className="border-t border-dashed border-black pt-2 mt-2 space-y-1 text-right text-[10px] font-bold">
-          <div className="flex justify-between"><span>SUBTOTAL</span> <span>{(order?.subtotal || 0).toFixed(2)}</span></div>
-          <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{(order?.cgst || 0).toFixed(2)}</span></div>
-          <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{(order?.sgst || 0).toFixed(2)}</span></div>
+          <div className="flex justify-between w-full"><span>SUBTOTAL</span> <span>{(order?.subtotal || 0).toFixed(2)}</span></div>
+          <div className="flex justify-between w-full"><span>CGST @ 2.5%</span> <span>{(order?.cgst || 0).toFixed(2)}</span></div>
+          <div className="flex justify-between w-full"><span>SGST @ 2.5%</span> <span>{(order?.sgst || 0).toFixed(2)}</span></div>
           {order?.packagingCharge ? (
-              <div className="flex justify-between text-black"><span>PACKAGING</span> <span>{order.packagingCharge.toFixed(2)}</span></div>
+              <div className="flex justify-between w-full text-black"><span>PACKAGING</span> <span>{order.packagingCharge.toFixed(2)}</span></div>
           ) : null}
-          <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-1 mt-1">
+          <div className="flex justify-between items-center w-full text-lg font-black border-t-2 border-black pt-1 mt-1">
               <span>TOTAL</span>
               <span>{formatCurrency(order?.totalPrice || 0)}</span>
           </div>
@@ -112,14 +112,14 @@ const Template2 = ({ order, settings }: ReceiptProps) => (
         </div>
         <div className="space-y-3 mb-6">
             {order.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between text-[11px]">
+                <div key={idx} className="flex justify-between w-full text-[11px]">
                     <span className="flex-1 font-semibold">{item.quantity}x {item.name}</span>
                     <span className="font-bold">{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
             ))}
         </div>
         <div className="pt-4 border-t-2 border-gray-100 space-y-1">
-            <div className="flex justify-between text-sm font-black"><span>GRAND TOTAL</span><span>{formatCurrency(order.totalPrice)}</span></div>
+            <div className="flex justify-between w-full text-sm font-black"><span>GRAND TOTAL</span><span>{formatCurrency(order.totalPrice)}</span></div>
         </div>
         <p className="text-center text-[9px] font-bold mt-6 opacity-40 uppercase tracking-[0.2em] mb-4">{settings.footerMessage}</p>
     </div>
@@ -137,7 +137,7 @@ const TemplateStub = ({ order, settings, id }: ReceiptProps & { id: number }) =>
             </div>
         </div>
         <div className="space-y-2 border-y border-black py-4 my-4">
-            {order.items.map((i, idx) => <div key={idx} className="flex justify-between text-xs"><span>{i.name} x{i.quantity}</span><span>{i.price * i.quantity}</span></div>)}
+            {order.items.map((i, idx) => <div key={idx} className="flex justify-between w-full text-xs"><span>{i.name} x{i.quantity}</span><span>{i.price * i.quantity}</span></div>)}
         </div>
         <div className="text-right font-black text-xl mb-4">TOTAL: {formatCurrency(order.totalPrice)}</div>
     </div>
@@ -169,13 +169,13 @@ export const KOTComponent = ({ order }: { order: Order, tableNumber: string | nu
         </div>
         <div className="border-b-2 border-dashed border-black mb-2 py-2 text-left space-y-2">
             {order.items.map((item, idx) => (
-                <div key={idx} className="flex text-lg items-start">
+                <div key={idx} className="flex text-lg items-start w-full">
                     <span className="w-10 font-black">{item.quantity}X</span>
-                    <span className="flex-1 font-bold uppercase">{item.name}</span>
+                    <span className="flex-1 font-bold uppercase break-words">{item.name}</span>
                 </div>
             ))}
         </div>
-        <div className="flex justify-between text-[10px] font-bold mb-4">
+        <div className="flex justify-between w-full text-[10px] font-bold mb-4">
             <span>{formatDate(order.timestamp)}</span>
             <span>{formatTime(order.timestamp)}</span>
         </div>

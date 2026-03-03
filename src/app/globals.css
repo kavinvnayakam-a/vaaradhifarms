@@ -50,49 +50,55 @@
   }
 }
 
-/* Print Layer Logic - CRITICAL FOR THERMAL PRINTERS (MyPOS / Restsol) */
+/* Print Layer Logic - RE-ENGINEERED FOR THERMAL STABILITY */
 .print-layer {
   display: none;
 }
 
 @media print {
-  /* Hide everything else on the screen */
+  /* Hide everything except the print layer */
   body * {
     visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* Reveal only the print layer */
+  /* Reveal the print layer and its children while preserving their display modes (flex/table) */
   .print-layer, 
   .print-layer * {
     visibility: visible !important;
-    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
-  /* Absolute positioning to top-left of the paper roll */
+  /* Essential positioning for MyPOS / Restsol */
   .print-layer {
+    display: block !important;
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
     width: 80mm !important;
     background: white !important;
     color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Force cuts between sections */
+  /* Force hard page cuts between segments */
   .print-page-break {
     display: block !important;
     page-break-after: always !important;
     break-after: page !important;
+    width: 80mm !important;
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
-    width: 80mm !important;
     clear: both !important;
   }
   
-  /* Reset page margins for physical thermal roll output */
+  /* Reset browser chrome - removes Date/URL headers */
   @page {
     margin: 0 !important;
     size: auto;
