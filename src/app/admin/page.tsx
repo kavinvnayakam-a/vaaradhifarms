@@ -21,7 +21,7 @@ import {
   LayoutList,
   Loader2,
   UtensilsCrossed,
-  LayoutDashboard
+  MoreHorizontal
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -34,10 +34,16 @@ import {
   SidebarTrigger,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
-  useSidebar
+  SidebarMenuButton
 } from "@/components/ui/sidebar";
 import { GetPikLogo } from "@/components/getpik-logo";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/Vaaradhi_Farms%2FVF_Logo.webp?alt=media&token=ed839d68-f527-48e4-b45a-f971d90357fa";
 
@@ -47,6 +53,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('counter');
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { user, isUserLoading } = useUser();
   const authInstance = useAuth();
   const firestore = useFirestore();
@@ -92,6 +99,10 @@ export default function AdminDashboard() {
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ];
 
+  // Logic for the mobile/tablet bottom bar (Limit to 4 primary items)
+  const primaryNav = navItems.slice(0, 4);
+  const secondaryNav = navItems.slice(4);
+
   if (isUserLoading) return <div className="h-screen w-full flex items-center justify-center bg-white"><Loader2 className="animate-spin text-background" /></div>;
   if (!user) return null;
 
@@ -99,11 +110,11 @@ export default function AdminDashboard() {
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen w-full bg-white text-zinc-900 font-sans relative overflow-hidden">
         {/* Optimized Desktop Sidebar */}
-        <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10 hidden md:flex">
-          <SidebarHeader className="py-12 px-4 flex flex-col items-center overflow-hidden">
+        <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10 hidden lg:flex">
+          <SidebarHeader className="py-12 px-4 flex flex-col items-center overflow-visible">
             <div className="relative group transition-all duration-500">
               <div className="absolute inset-0 bg-white/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-white p-3 rounded-2xl shadow-2xl min-w-[60px] min-h-[60px] flex items-center justify-center">
+              <div className="relative bg-white p-3 rounded-2xl shadow-2xl min-w-[60px] min-h-[60px] flex items-center justify-center group-data-[collapsible=icon]:scale-125 group-data-[collapsible=icon]:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500">
                 <Image 
                   src={LOGO_URL} 
                   alt="Vaaradhi Farms" 
@@ -127,7 +138,7 @@ export default function AdminDashboard() {
                     onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} 
                     isActive={activeTab === item.id} 
                     className={cn(
-                      "flex items-center gap-4 px-4 py-8 rounded-2xl transition-all duration-500 group relative", 
+                      "flex items-center gap-4 px-4 py-8 rounded-2xl transition-all duration-500 group relative overflow-hidden", 
                       activeTab === item.id 
                         ? "bg-white text-background shadow-[0_15px_30px_rgba(0,0,0,0.2)] scale-[1.02]" 
                         : "text-white/60 hover:bg-white/5 hover:text-white"
@@ -164,10 +175,10 @@ export default function AdminDashboard() {
         <div className="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-50/30">
           <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-2xl border-b border-zinc-100 px-4 md:px-10 py-4 md:py-8 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4 md:gap-8">
-              <SidebarTrigger className="text-zinc-400 hover:text-background hover:bg-background/5 p-2 rounded-xl transition-all shrink-0">
+              <SidebarTrigger className="hidden lg:flex text-zinc-400 hover:text-background hover:bg-background/5 p-2 rounded-xl transition-all shrink-0">
                 <PanelLeft className="w-5 h-5 md:w-6 md:h-6" />
               </SidebarTrigger>
-              <div className="h-8 w-px bg-zinc-100 hidden md:block" />
+              <div className="h-8 w-px bg-zinc-100 hidden lg:block" />
               <h2 className="text-xl md:text-4xl font-black italic uppercase tracking-tighter text-zinc-900 truncate flex items-center gap-4">
                 <span className="opacity-10 text-background">/</span>
                 {activeTab.replace('_', ' ')}
@@ -183,12 +194,11 @@ export default function AdminDashboard() {
           </header>
 
           <main className="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar relative">
-            {/* Background Branding Watermark */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.02] select-none scale-150">
                <Image src={LOGO_URL} alt="" width={400} height={172} />
             </div>
 
-            <div className="max-w-7xl mx-auto pb-24 md:pb-10 relative z-10">
+            <div className="max-w-7xl mx-auto pb-32 md:pb-10 relative z-10">
               {activeTab === 'counter' && <OrderManager />}
               {activeTab === 'packing' && <KotView />}
               {activeTab === 'today_orders' && <TodayOrders />}
@@ -198,15 +208,15 @@ export default function AdminDashboard() {
             </div>
           </main>
 
-          {/* Mobile Bottom Navigation */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-[50] bg-white border-t border-zinc-100 flex items-center justify-around h-24 px-4 shadow-[0_-15px_50px_rgba(0,0,0,0.08)]">
-            <div className="flex w-full overflow-x-auto no-scrollbar snap-x px-2 gap-2">
-              {navItems.map((item) => (
+          {/* Mobile & Tablet Bottom Navigation (Up to Large Screens) */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[50] bg-white/90 backdrop-blur-2xl border-t border-zinc-100 flex items-center justify-around h-24 px-4 shadow-[0_-15px_50px_rgba(0,0,0,0.08)]">
+            <div className="flex w-full max-w-2xl mx-auto items-center justify-between px-2 gap-1">
+              {primaryNav.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }}
                   className={cn(
-                    "flex-shrink-0 flex flex-col items-center justify-center gap-2 min-w-[76px] snap-center transition-all duration-500 rounded-2xl py-3",
+                    "flex-1 flex flex-col items-center justify-center gap-2 transition-all duration-500 rounded-2xl py-3 px-1",
                     activeTab === item.id ? "bg-background text-white shadow-xl scale-105" : "text-zinc-300"
                   )}
                 >
@@ -216,11 +226,50 @@ export default function AdminDashboard() {
                       <span className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-pulse border-2 border-background" />
                     )}
                   </div>
-                  <span className="text-[8px] font-black uppercase tracking-widest text-center truncate w-full px-1">
-                    {item.label.includes(' ') ? item.label.split(' ')[0] : item.label}
+                  <span className="text-[8px] font-black uppercase tracking-widest text-center truncate w-full">
+                    {item.label.split(' ')[0]}
                   </span>
                 </button>
               ))}
+
+              {/* More Trigger */}
+              <Sheet open={isMoreOpen} onOpenChange={setIsMoreOpen}>
+                <SheetTrigger asChild>
+                  <button className={cn(
+                    "flex-1 flex flex-col items-center justify-center gap-2 transition-all duration-500 rounded-2xl py-3 px-1",
+                    secondaryNav.some(i => i.id === activeTab) ? "bg-zinc-900 text-white" : "text-zinc-300"
+                  )}>
+                    <MoreHorizontal className="w-5 h-5" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">More</span>
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="rounded-t-[3rem] border-none bg-zinc-50 p-8 pb-12">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-2xl font-black italic uppercase tracking-tighter">Boutique Tools</SheetTitle>
+                  </SheetHeader>
+                  <div className="grid grid-cols-2 gap-4">
+                    {secondaryNav.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => { setActiveTab(item.id); setIsMoreOpen(false); }}
+                        className={cn(
+                          "flex flex-col items-center gap-4 p-8 rounded-[2rem] transition-all",
+                          activeTab === item.id ? "bg-background text-white shadow-2xl" : "bg-white text-zinc-400 border border-zinc-100"
+                        )}
+                      >
+                        <item.icon className="w-8 h-8" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                      </button>
+                    ))}
+                    <button 
+                      onClick={handleSignOut}
+                      className="col-span-2 flex items-center justify-center gap-3 p-6 mt-4 rounded-2xl bg-rose-50 text-rose-500 font-black uppercase text-[10px] tracking-widest"
+                    >
+                      <LogOut size={16} /> End Management Session
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
