@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -12,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency, cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ReceiptRouter, KOTComponent, CollectionTokenComponent, type PrintSettings as AppPrintSettings } from './receipt-templates';
 
 interface PrintSettings extends AppPrintSettings {}
@@ -199,39 +198,51 @@ export default function TodayOrders() {
       </div>
 
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
-        <DialogContent className="max-w-[75vw] rounded-[3rem] p-0 overflow-hidden bg-zinc-950 border-none shadow-2xl">
-          <DialogHeader className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
+        <DialogContent className="max-w-[95vw] md:max-w-md rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
+          <DialogHeader className="p-6 border-b border-white/5 flex justify-between items-center bg-black/40">
              <div>
-                <DialogTitle className="text-2xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-background" /> Reprint Console
+                <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
+                   <ReceiptText className="text-background" /> Thermal Preview
                 </DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Reviewing Token #{printingOrder?.orderNumber}</DialogDescription>
+                <DialogDescription className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">Review Layout Sequence</DialogDescription>
              </div>
-             <button onClick={() => setShowPrintPreview(false)} className="p-3 text-white/20 hover:text-white transition-colors"><X size={24} /></button>
+             <button onClick={() => setShowPrintPreview(false)} className="p-2 text-white/20 hover:text-white transition-colors">
+                <X size={20} />
+             </button>
           </DialogHeader>
           
-          <div className="p-12 bg-zinc-900/50 flex gap-10 overflow-x-auto justify-center items-start custom-scrollbar h-[60vh]">
-            <div className="space-y-4">
-               <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Official Invoice</p>
+          <div className="p-6 md:p-8 flex flex-col gap-10 items-center overflow-y-auto max-h-[60vh] custom-scrollbar bg-zinc-900/50">
+            <div className="space-y-2 w-full flex flex-col items-center">
+               <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">1. Invoice</p>
                {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />}
             </div>
-            <div className="space-y-4">
-               <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Kitchen Order Ticket</p>
+            <div className="space-y-2 w-full flex flex-col items-center">
+               <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">2. Kitchen Ticket (KOT)</p>
                {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
             </div>
-            <div className="space-y-4">
-              <p className="text-center text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
+            <div className="space-y-2 w-full flex flex-col items-center">
+              <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">3. Collection Token</p>
               {printingOrder && <CollectionTokenComponent order={printingOrder} />}
             </div>
           </div>
 
-          <div className="p-8 bg-black/40 border-t border-white/5">
-             <button onClick={() => { window.print(); setShowPrintPreview(false); }} className="w-full py-6 bg-background text-white rounded-2xl font-black uppercase tracking-widest text-[13px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95">
-                <Printer size={20} className="inline mr-3" /> Re-Execute Thermal Print
+          <div className="p-6 bg-black/40 border-t border-white/5">
+             <button onClick={() => { window.print(); setShowPrintPreview(false); }} className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95">
+                Execute Thermal Print
              </button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <div id="printable-receipt" className="hidden">
+        {printingOrder && (
+          <>
+            <div style={{ breakAfter: 'page' }}><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
+            <div style={{ breakAfter: 'page' }}><KOTComponent order={printingOrder} tableNumber={null} /></div>
+            <div><CollectionTokenComponent order={printingOrder} /></div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

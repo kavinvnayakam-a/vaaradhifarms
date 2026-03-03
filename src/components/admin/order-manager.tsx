@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -7,13 +6,13 @@ import {
   collection, onSnapshot, query, orderBy, doc, 
   updateDoc, addDoc, serverTimestamp, runTransaction 
 } from 'firebase/firestore';
-import { Order, MenuItem, CartItem, Table as TableType } from '@/lib/types';
+import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Plus, Store, Hash, Clock, User, ArrowRight, ShoppingBag, Search, X, Printer
+  Plus, Store, ShoppingBag, Clock, User, ArrowRight, Search, X, Printer
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { cn, formatCurrency } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { formatCurrency } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -216,10 +215,6 @@ export default function OrderManager() {
 
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="max-w-[95vw] md:max-w-6xl rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl">
-          <DialogHeader className="sr-only">
-            <DialogTitle>New Manual Order</DialogTitle>
-            <DialogDescription>Create a new order by selecting items from the menu.</DialogDescription>
-          </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 h-[85vh] md:h-[80vh] overflow-y-auto">
             <div className="md:col-span-7 bg-zinc-50 p-6 md:p-10 flex flex-col gap-6 md:gap-8 h-full">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -228,7 +223,7 @@ export default function OrderManager() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={16} />
                   <input 
                     placeholder="Search menu..." 
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-100 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase outline-none focus:border-background transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-100 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase outline-none focus:border-background transition-all text-zinc-900"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -267,15 +262,15 @@ export default function OrderManager() {
                 <div className="space-y-3 md:space-y-4">
                   <div className="space-y-1.5">
                     <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Customer Name</Label>
-                    <Input placeholder="Enter name" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-10 md:h-12 bg-zinc-50 border-zinc-100 rounded-lg md:rounded-xl font-bold" />
+                    <Input placeholder="Enter name" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-10 md:h-12 bg-zinc-50 border-zinc-100 rounded-lg md:rounded-xl font-bold text-zinc-900" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Order Mode</Label>
                     <Select value={manualOrderTableId} onValueChange={setManualOrderTableId}>
-                      <SelectTrigger className="h-10 md:h-12 bg-zinc-50 border-zinc-100 rounded-lg md:rounded-xl font-bold"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-10 md:h-12 bg-zinc-50 border-zinc-100 rounded-lg md:rounded-xl font-bold text-zinc-900"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Takeaway">Takeaway</SelectItem>
-                        <SelectItem value="DineIn">Dine-In</SelectItem>
+                        <SelectItem value="Dine-In">Dine-In</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -330,46 +325,40 @@ export default function OrderManager() {
       </Dialog>
 
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
-        <DialogContent className="max-w-[95vw] md:max-w-[75vw] rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
-          <DialogHeader className="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
+        <DialogContent className="max-w-[95vw] md:max-w-md rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
+          <DialogHeader className="p-6 border-b border-white/5 flex justify-between items-center bg-black/40">
              <div>
-                <DialogTitle className="text-xl md:text-2xl font-black uppercase italic text-white flex items-center gap-2 md:gap-3">
-                   <Printer className="text-background md:w-6 md:h-6" /> Thermal Preview
+                <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
+                   <Printer className="text-background" /> Thermal Preview
                 </DialogTitle>
-                <DialogDescription className="text-[9px] md:text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Verify layout before physical output</DialogDescription>
+                <DialogDescription className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">Review Layout Sequence</DialogDescription>
              </div>
-             <button onClick={() => setShowPrintPreview(false)} className="p-2 md:p-3 text-white/20 hover:text-white transition-colors">
-                <X size={20} className="md:w-6 md:h-6" />
+             <button onClick={() => setShowPrintPreview(false)} className="p-2 text-white/20 hover:text-white transition-colors">
+                <X size={20} />
              </button>
           </DialogHeader>
           
-          <div className="p-6 md:p-12 flex flex-col md:flex-row gap-6 md:gap-10 overflow-y-auto md:overflow-x-auto justify-center items-center md:items-start custom-scrollbar h-[60vh] md:h-auto">
-            <div className="flex-shrink-0 space-y-3 md:space-y-4 w-full md:w-auto">
-               <p className="text-center text-white/30 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">Customer Receipt</p>
-               <div className="flex justify-center scale-90 md:scale-100">
-                 {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />}
-               </div>
+          <div className="p-6 md:p-8 flex flex-col gap-10 items-center overflow-y-auto max-h-[60vh] custom-scrollbar bg-zinc-900/50">
+            <div className="space-y-2 w-full flex flex-col items-center">
+               <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">1. Customer Receipt</p>
+               {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />}
             </div>
-            <div className="flex-shrink-0 space-y-3 md:space-y-4 w-full md:w-auto">
-               <p className="text-center text-white/30 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">Kitchen Ticket (KOT)</p>
-               <div className="flex justify-center scale-90 md:scale-100">
-                 {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
-               </div>
+            <div className="space-y-2 w-full flex flex-col items-center">
+               <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">2. Kitchen Ticket (KOT)</p>
+               {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
             </div>
-            <div className="flex-shrink-0 space-y-3 md:space-y-4 w-full md:w-auto">
-              <p className="text-center text-white/30 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">Collection Token</p>
-              <div className="flex justify-center scale-90 md:scale-100">
-                {printingOrder && <CollectionTokenComponent order={printingOrder} />}
-              </div>
+            <div className="space-y-2 w-full flex flex-col items-center">
+              <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">3. Collection Token</p>
+              {printingOrder && <CollectionTokenComponent order={printingOrder} />}
             </div>
           </div>
 
-          <div className="p-6 md:p-8 bg-black/40 border-t border-white/5">
+          <div className="p-6 bg-black/40 border-t border-white/5">
             <button 
               onClick={() => { window.print(); setShowPrintPreview(false); }} 
-              className="w-full py-4 md:py-6 bg-background text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[11px] md:text-[13px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95"
+              className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95"
             >
-              Execute {printSettings.optimizedFor} Print
+              Execute Thermal Print
             </button>
           </div>
         </DialogContent>

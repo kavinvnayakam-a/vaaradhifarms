@@ -49,7 +49,7 @@ const Template1 = ({ order, settings }: ReceiptProps) => (
           </div>
           <div className="flex justify-between font-black">
               <span>Token No.: #{order.orderNumber}</span>
-              <span>{order.tableId === 'Takeaway' ? 'Takeaway' : 'Dine-In'}</span>
+              <span>{order.tableId}</span>
           </div>
           <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
               <span className="uppercase">Cust: {order.customerName}</span>
@@ -118,7 +118,6 @@ const Template2 = ({ order, settings }: ReceiptProps) => (
     </div>
 );
 
-// Stub placeholders for 3-10 to fulfill the "10 templates" requirement
 const TemplateStub = ({ order, settings, id }: ReceiptProps & { id: number }) => (
     <div className="bg-white text-black p-6 font-mono w-[80mm] border-4 border-double border-black shadow-lg">
         <h3 className="text-center font-black uppercase text-lg border-b-2 border-black pb-2 mb-4">Template {id}</h3>
@@ -156,11 +155,11 @@ export const KOTComponent = ({ order }: { order: Order, tableNumber: string | nu
             <p className="text-2xl font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2 mb-2">
                 K.O.T
             </p>
-            <h1 className="text-6xl font-black italic leading-none my-4">
+            <h1 className="text-5xl font-black italic leading-none my-4">
                 #{order?.orderNumber}
             </h1>
             <p className="text-xl font-bold mt-1">
-                ({order.tableId === 'Takeaway' ? 'Collection' : 'Dine-In'})
+                ({order.tableId})
             </p>
         </div>
         <div className="border-y-2 border-dashed border-black my-4 py-3 text-left space-y-2">
@@ -179,20 +178,19 @@ export const KOTComponent = ({ order }: { order: Order, tableNumber: string | nu
 );
 
 export const CollectionTokenComponent = ({ order }: { order: Order }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center shadow-2xl border-2 border-zinc-100 h-full flex flex-col justify-center">
-        <p className="text-lg font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2">
+    <div className="bg-white text-black p-8 font-mono w-[80mm] text-center shadow-2xl border-2 border-zinc-100 flex flex-col justify-center min-h-[300px]">
+        <p className="text-lg font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-4 mb-6">
             Collection Token
         </p>
-        <p className="text-[10px] font-bold mt-6 uppercase text-zinc-400">Order Number</p>
-        <h1 className="text-[12rem] font-black italic leading-none my-2 -tracking-[0.05em]">#{order.orderNumber}</h1>
-        <div className="border-t-2 border-dashed border-black pt-4 mt-4">
-            <p className="text-center font-black uppercase text-xl text-black">
-                {order.tableId === 'Takeaway' ? 'TAKEAWAY' : 'DINE-IN'}
+        <p className="text-[10px] font-bold uppercase text-zinc-400">Token Number</p>
+        <h1 className="text-8xl font-black italic leading-none my-4 tracking-tighter">#{order.orderNumber}</h1>
+        <div className="border-t-2 border-dashed border-black pt-6 mt-6">
+            <p className="text-center font-black uppercase text-2xl text-black tracking-widest">
+                {order.tableId.toUpperCase()}
             </p>
         </div>
-        <div className="border-t-2 border-dashed border-black mt-6 pt-4">
-            <p className="text-center text-[10px] font-bold uppercase">Please present this at the counter.</p>
-            <p className="text-center text-[8px] font-bold mt-2 opacity-30">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
+        <div className="mt-8 opacity-30">
+            <p className="text-[8px] font-bold uppercase">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
         </div>
     </div>
 );
