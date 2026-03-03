@@ -194,7 +194,7 @@ export default function OrderManager() {
 
             <button 
               onClick={() => confirmOrder(order)} 
-              className="w-full py-4 md:py-5 bg-background text-white rounded-[1.2rem] md:rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] md:text-[11px] hover:bg-zinc-900 transition-all shadow-lg shadow-background/20 flex items-center justify-center gap-3 active:scale-95"
+              className="w-full py-4 md:py-5 bg-background text-white rounded-[1.2rem] md:rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] md:text-11px hover:bg-zinc-900 transition-all shadow-lg shadow-background/20 flex items-center justify-center gap-3 active:scale-95"
             >
               <span>Accept Order</span>
               <ArrowRight size={14} className="md:w-4 md:h-4" />
@@ -314,7 +314,7 @@ export default function OrderManager() {
                 <button 
                   onClick={handleCreateOrder} 
                   disabled={selectedItems.length === 0 || !customerName}
-                  className="w-full py-4 md:py-5 bg-background text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-xl shadow-background/20 hover:bg-zinc-900 transition-all disabled:opacity-50 active:scale-95"
+                  className="w-full h-20 text-[13px] font-black uppercase tracking-[0.4em] bg-background text-white hover:bg-black rounded-[2rem] transition-all duration-700 flex items-center justify-center gap-5 shadow-2xl active:scale-95 border-none mt-6"
                 >
                   Confirm & Place Order
                 </button>
@@ -364,13 +364,20 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      <div id="printable-receipt" className="hidden">
+      {/* HIDDEN PRINT LAYER: Dedicated container for physical receipt output */}
+      <div id="printable-receipt" className="print-layer">
         {printingOrder && (
-          <>
-            <div className="print-page-break"><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
-            <div className="print-page-break"><KOTComponent order={printingOrder} tableNumber={null} /></div>
-            <div className="print-page-break"><CollectionTokenComponent order={printingOrder} /></div>
-          </>
+          <div className="flex flex-col bg-white">
+            <div className="print-page-break">
+              <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />
+            </div>
+            <div className="print-page-break">
+              <KOTComponent order={printingOrder} tableNumber={null} />
+            </div>
+            <div className="print-page-break">
+              <CollectionTokenComponent order={printingOrder} />
+            </div>
+          </div>
         )}
       </div>
     </div>

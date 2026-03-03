@@ -40,7 +40,6 @@ export default function TodayOrders() {
   const firestore = useFirestore();
   const { toast } = useToast();
   
-  // Shift starts at 1:00 AM
   const getShiftStart = () => {
     const d = new Date();
     d.setHours(1, 0, 0, 0);
@@ -234,13 +233,20 @@ export default function TodayOrders() {
         </DialogContent>
       </Dialog>
 
-      <div id="printable-receipt" className="hidden">
+      {/* HIDDEN PRINT LAYER: Dedicated container for physical receipt output */}
+      <div id="printable-receipt" className="print-layer">
         {printingOrder && (
-          <>
-            <div className="print-page-break"><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
-            <div className="print-page-break"><KOTComponent order={printingOrder} tableNumber={null} /></div>
-            <div className="print-page-break"><CollectionTokenComponent order={printingOrder} /></div>
-          </>
+          <div className="flex flex-col bg-white">
+            <div className="print-page-break">
+              <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />
+            </div>
+            <div className="print-page-break">
+              <KOTComponent order={printingOrder} tableNumber={null} />
+            </div>
+            <div className="print-page-break">
+              <CollectionTokenComponent order={printingOrder} />
+            </div>
+          </div>
         )}
       </div>
     </div>

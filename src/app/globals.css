@@ -50,6 +50,49 @@
   }
 }
 
+/* Custom class to hide print elements on screen but keep them available for print media */
+.print-layer {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-layer, .print-layer * {
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  .print-layer {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 80mm !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* FORCED PAGE BREAKS FOR THERMAL PRINTERS (MyPOS / Restsol Compatibility) */
+  .print-page-break {
+    display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  /* Reset page margins for physical output */
+  @page {
+    margin: 0 !important;
+    size: auto;
+  }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-15px); }
@@ -95,40 +138,6 @@
 
 .animate-chop {
   animation: chop 0.5s ease-in-out infinite;
-}
-
-@media print {
-  body * {
-    visibility: hidden !important;
-  }
-
-  #printable-receipt, #printable-receipt *,
-  #printable-eod-report, #printable-eod-report * {
-    visibility: visible !important;
-  }
-
-  #printable-receipt, #printable-eod-report {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    display: block !important;
-    width: 80mm !important;
-  }
-
-  /* FORCED PAGE BREAKS FOR THERMAL PRINTERS */
-  .print-page-break {
-    page-break-after: always !important;
-    break-after: page !important;
-    display: block !important;
-    margin-bottom: 20px !important;
-  }
-  
-  @page {
-    margin: 0 !important;
-    size: auto !important;
-  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
