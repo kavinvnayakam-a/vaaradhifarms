@@ -61,7 +61,7 @@ export default function OrderManager() {
       setMenuItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MenuItem[]);
     });
     const unsubSettings = onSnapshot(doc(firestore, "settings", "print_template"), (d) => {
-      if (d.exists()) setPrintSettings({ ...DEFAULT_PRINT_SETTINGS, ...d.data() });
+      if (d.exists()) setPrintSettings({ ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings);
     });
     return () => { unsubOrders(); unsubMenu(); unsubSettings(); };
   }, [firestore]);
@@ -367,9 +367,9 @@ export default function OrderManager() {
       <div id="printable-receipt" className="hidden">
         {printingOrder && (
           <>
-            <div style={{ breakAfter: 'page' }}><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
-            <div style={{ breakAfter: 'page' }}><KOTComponent order={printingOrder} tableNumber={null} /></div>
-            <div><CollectionTokenComponent order={printingOrder} /></div>
+            <div className="print-page-break"><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
+            <div className="print-page-break"><KOTComponent order={printingOrder} tableNumber={null} /></div>
+            <div className="print-page-break"><CollectionTokenComponent order={printingOrder} /></div>
           </>
         )}
       </div>

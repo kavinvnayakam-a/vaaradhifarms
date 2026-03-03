@@ -307,6 +307,8 @@ export default function AnalyticsDashboard() {
               <div className="text-center border-b border-dashed border-black pb-4 mb-4">
                 <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Vaaradhi Farms'}</h1>
                 <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
+                {printSettings?.gstin && <p className="text-[9px] font-black uppercase">GSTIN: {printSettings.gstin}</p>}
+                {printSettings?.fssai && <p className="text-[9px] font-black uppercase">FSSAI: {printSettings.fssai}</p>}
                 <p className="text-base font-black mt-4 border-y border-black py-2">EOD SALES SUMMARY</p>
                 <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
@@ -365,6 +367,8 @@ export default function AnalyticsDashboard() {
             <div className="text-center border-b border-dashed border-black pb-2 mb-2">
               <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Vaaradhi Farms"}</h1>
               <p className="uppercase text-[9px] font-bold mb-1">{printSettings?.address}</p>
+              {printSettings?.gstin && <p className="text-[9px] font-black uppercase">GSTIN: {printSettings.gstin}</p>}
+              {printSettings?.fssai && <p className="text-[9px] font-black uppercase">FSSAI: {printSettings.fssai}</p>}
               <div className="text-sm font-black border-y border-black py-1 my-1 uppercase">
                 EOD Report Summary
               </div>

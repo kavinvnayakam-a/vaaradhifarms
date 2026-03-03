@@ -1,5 +1,4 @@
-
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react';
 import { useFirestore } from '@/firebase';
@@ -142,9 +141,15 @@ export default function SettingsManager() {
                   <Input value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">GSTIN Number</Label>
-                  <Input value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">GSTIN Number</Label>
+                    <Input value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">FSSAI Number</Label>
+                    <Input value={tempSettings.fssai} onChange={(e) => setTempSettings(s => ({...s, fssai: e.target.value}))} className="h-12 border-zinc-200 rounded-xl font-bold bg-white text-zinc-900" />
+                  </div>
                 </div>
 
                 <div className="space-y-3">

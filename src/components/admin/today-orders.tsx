@@ -237,9 +237,9 @@ export default function TodayOrders() {
       <div id="printable-receipt" className="hidden">
         {printingOrder && (
           <>
-            <div style={{ breakAfter: 'page' }}><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
-            <div style={{ breakAfter: 'page' }}><KOTComponent order={printingOrder} tableNumber={null} /></div>
-            <div><CollectionTokenComponent order={printingOrder} /></div>
+            <div className="print-page-break"><ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} /></div>
+            <div className="print-page-break"><KOTComponent order={printingOrder} tableNumber={null} /></div>
+            <div className="print-page-break"><CollectionTokenComponent order={printingOrder} /></div>
           </>
         )}
       </div>

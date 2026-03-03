@@ -40,7 +40,10 @@ const Template1 = ({ order, settings }: ReceiptProps) => (
           <h2 className="text-lg font-black uppercase">{settings.storeName}</h2>
           <p className="text-[9px] uppercase font-bold leading-tight px-4">{settings.address}</p>
           <p className="text-[9px] font-bold">PH: {settings.phone}</p>
-          {settings.gstin && <p className="text-[9px] font-bold">GSTIN: {settings.gstin}</p>}
+          <div className="mt-1 space-y-0.5">
+            {settings.gstin && <p className="text-[9px] font-black uppercase">GSTIN: {settings.gstin}</p>}
+            {settings.fssai && <p className="text-[9px] font-black uppercase">FSSAI: {settings.fssai}</p>}
+          </div>
       </div>
       <div className="border-y border-dashed border-black py-1 my-2 text-[10px]">
           <div className="flex justify-between">
@@ -96,6 +99,10 @@ const Template2 = ({ order, settings }: ReceiptProps) => (
         <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold tracking-tight uppercase leading-none mb-1">{settings.storeName}</h2>
             <p className="text-[9px] text-gray-500 uppercase tracking-widest">{settings.address}</p>
+            <div className="mt-2 flex flex-col items-center">
+               {settings.gstin && <span className="text-[8px] font-bold uppercase">GST: {settings.gstin}</span>}
+               {settings.fssai && <span className="text-[8px] font-bold uppercase">FSSAI: {settings.fssai}</span>}
+            </div>
         </div>
         <div className="grid grid-cols-2 gap-x-4 text-[10px] mb-4 border-y border-gray-200 py-2">
             <div><span className="font-bold">Token:</span> #{order.orderNumber}</div>
@@ -124,6 +131,10 @@ const TemplateStub = ({ order, settings, id }: ReceiptProps & { id: number }) =>
         <div className="text-center mb-4">
             <p className="text-sm font-bold">{settings.storeName}</p>
             <p className="text-[10px]">Token: #{order.orderNumber}</p>
+            <div className="text-[8px] mt-1">
+              {settings.gstin && <p>GST: {settings.gstin}</p>}
+              {settings.fssai && <p>FSSAI: {settings.fssai}</p>}
+            </div>
         </div>
         <div className="space-y-2 border-y border-black py-4 my-4">
             {order.items.map((i, idx) => <div key={idx} className="flex justify-between text-xs"><span>{i.name} x{i.quantity}</span><span>{i.price * i.quantity}</span></div>)}
