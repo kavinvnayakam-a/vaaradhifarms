@@ -13,11 +13,11 @@ export function StatusVisualizer({ status }: { status: Status }) {
 
   // Status-aware callout messages
   const getCalloutText = () => {
-    if (isPending) return "Just a quick nap...";
-    if (status === 'Received') return "Order's here!";
+    if (isPending) return "Waiting for order confrimation...";
+    if (status === 'Received') return "Preparing in Kitchen";
     if (status === 'Preparing') return "Cooking fresh!";
     if (status === 'Served') return "Almost ready!";
-    if (isDelivering) return "The harvest is ready!";
+    if (isDelivering) return "The food is ready!";
     return "Farm is ready!";
   };
 
