@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -21,7 +20,8 @@ import {
   PanelLeft,
   LayoutList,
   Loader2,
-  UtensilsCrossed
+  UtensilsCrossed,
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -35,6 +35,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { GetPikLogo } from "@/components/getpik-logo";
 
@@ -97,68 +98,97 @@ export default function AdminDashboard() {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen w-full bg-white text-zinc-900 font-sans relative overflow-hidden">
-        {/* Sidebar - Desktop Only behavior */}
+        {/* Optimized Desktop Sidebar */}
         <Sidebar collapsible="icon" className="bg-background text-white border-r border-white/10 hidden md:flex">
-          <SidebarHeader className="py-10 px-4 flex flex-col items-center">
-            <div className="bg-white px-4 py-2 rounded-xl shadow-xl">
-              <Image src={LOGO_URL} alt="Vaaradhi Farms" width={120} height={52} className="object-contain" />
+          <SidebarHeader className="py-12 px-4 flex flex-col items-center overflow-hidden">
+            <div className="relative group transition-all duration-500">
+              <div className="absolute inset-0 bg-white/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-white p-3 rounded-2xl shadow-2xl min-w-[60px] min-h-[60px] flex items-center justify-center">
+                <Image 
+                  src={LOGO_URL} 
+                  alt="Vaaradhi Farms" 
+                  width={80} 
+                  height={34} 
+                  className="object-contain" 
+                />
+              </div>
             </div>
-            <h1 className="text-lg font-black uppercase tracking-widest mt-6 italic">Vaaradhi</h1>
+            <div className="mt-6 text-center group-data-[collapsible=icon]:hidden">
+              <h1 className="text-sm font-black uppercase tracking-[0.3em] italic text-white/90">Vaaradhi</h1>
+              <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest mt-1">Management</p>
+            </div>
           </SidebarHeader>
-          <SidebarContent className="px-3 py-6">
+
+          <SidebarContent className="px-4 py-8">
             <SidebarMenu>
               {navItems.map((item) => (
-                <SidebarMenuItem key={item.id} className="mb-2">
+                <SidebarMenuItem key={item.id} className="mb-3">
                   <SidebarMenuButton 
                     onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }} 
                     isActive={activeTab === item.id} 
                     className={cn(
-                      "flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300", 
+                      "flex items-center gap-4 px-4 py-8 rounded-2xl transition-all duration-500 group relative", 
                       activeTab === item.id 
-                        ? "bg-white text-background shadow-lg" 
-                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                        ? "bg-white text-background shadow-[0_15px_30px_rgba(0,0,0,0.2)] scale-[1.02]" 
+                        : "text-white/60 hover:bg-white/5 hover:text-white"
                     )}
                   >
-                    <item.icon className="w-5 h-5 shrink-0" />
-                    <span>{item.label}</span>
+                    <item.icon className={cn("w-5 h-5 shrink-0 transition-transform group-hover:scale-110", activeTab === item.id && "stroke-[2.5px]")} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden">
+                      {item.label}
+                    </span>
                     {item.showBadge && (
-                      <span className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_white]" />
+                      <span className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_white] group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:top-2 group-data-[collapsible=icon]:right-2" />
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="p-6 border-t border-white/10 flex flex-col gap-8">
-            <button onClick={handleSignOut} className="flex items-center gap-4 text-[10px] font-black uppercase text-white/40 hover:text-white transition-all w-full text-left">
-              <LogOut className="w-4 h-4" /> <span>Sign Out</span>
+
+          <SidebarFooter className="p-6 border-t border-white/5 flex flex-col gap-10">
+            <button 
+              onClick={handleSignOut} 
+              className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-white transition-all group w-full px-4"
+            >
+              <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> 
+              <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
             </button>
-            <div className="mt-2">
-              <GetPikLogo variant="opacity" />
+            
+            <div className="flex justify-center group-data-[collapsible=icon]:hidden">
+              <GetPikLogo variant="opacity" className="scale-[0.8]" />
             </div>
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white">
-          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100 px-4 md:px-8 py-4 md:py-6 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-3 md:gap-6">
-              <SidebarTrigger className="text-zinc-400 hover:text-background transition-colors shrink-0">
+        <div className="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-50/30">
+          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-2xl border-b border-zinc-100 px-4 md:px-10 py-4 md:py-8 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-4 md:gap-8">
+              <SidebarTrigger className="text-zinc-400 hover:text-background hover:bg-background/5 p-2 rounded-xl transition-all shrink-0">
                 <PanelLeft className="w-5 h-5 md:w-6 md:h-6" />
               </SidebarTrigger>
-              <h2 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter text-zinc-900 truncate">
+              <div className="h-8 w-px bg-zinc-100 hidden md:block" />
+              <h2 className="text-xl md:text-4xl font-black italic uppercase tracking-tighter text-zinc-900 truncate flex items-center gap-4">
+                <span className="opacity-10 text-background">/</span>
                 {activeTab.replace('_', ' ')}
               </h2>
             </div>
-            <div className="flex items-center gap-2 md:gap-4">
-              <div className="px-3 md:px-5 py-2 md:py-3 bg-background/5 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-3 border border-background/10">
-                <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-background whitespace-nowrap">System Live</span>
+            
+            <div className="flex items-center gap-3 md:gap-6">
+              <div className="px-4 md:px-6 py-2 md:py-3.5 bg-background/5 rounded-2xl flex items-center gap-3 border border-background/10">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-background whitespace-nowrap">Cloud Connected</span>
               </div>
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-            <div className="max-w-7xl mx-auto pb-24 md:pb-20 text-zinc-900">
+          <main className="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar relative">
+            {/* Background Branding Watermark */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.02] select-none scale-150">
+               <Image src={LOGO_URL} alt="" width={400} height={172} />
+            </div>
+
+            <div className="max-w-7xl mx-auto pb-24 md:pb-10 relative z-10">
               {activeTab === 'counter' && <OrderManager />}
               {activeTab === 'packing' && <KotView />}
               {activeTab === 'today_orders' && <TodayOrders />}
@@ -169,24 +199,24 @@ export default function AdminDashboard() {
           </main>
 
           {/* Mobile Bottom Navigation */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-[50] bg-white border-t border-zinc-100 flex items-center justify-around h-20 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-            <div className="flex w-full overflow-x-auto no-scrollbar snap-x px-2">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-[50] bg-white border-t border-zinc-100 flex items-center justify-around h-24 px-4 shadow-[0_-15px_50px_rgba(0,0,0,0.08)]">
+            <div className="flex w-full overflow-x-auto no-scrollbar snap-x px-2 gap-2">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => { setActiveTab(item.id); if (item.id === 'counter') setNewOrderCount(0); }}
                   className={cn(
-                    "flex-shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[64px] snap-center transition-all duration-300",
-                    activeTab === item.id ? "text-background scale-110" : "text-zinc-300"
+                    "flex-shrink-0 flex flex-col items-center justify-center gap-2 min-w-[76px] snap-center transition-all duration-500 rounded-2xl py-3",
+                    activeTab === item.id ? "bg-background text-white shadow-xl scale-105" : "text-zinc-300"
                   )}
                 >
                   <div className="relative">
-                    <item.icon className={cn("w-5 h-5", activeTab === item.id ? "stroke-[3px]" : "stroke-[2px]")} />
+                    <item.icon className={cn("w-5 h-5", activeTab === item.id ? "stroke-[2.5px]" : "stroke-[2px]")} />
                     {item.showBadge && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-background rounded-full animate-pulse border-2 border-white" />
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-pulse border-2 border-background" />
                     )}
                   </div>
-                  <span className="text-[7px] font-black uppercase tracking-widest text-center truncate w-full px-1">
+                  <span className="text-[8px] font-black uppercase tracking-widest text-center truncate w-full px-1">
                     {item.label.includes(' ') ? item.label.split(' ')[0] : item.label}
                   </span>
                 </button>
