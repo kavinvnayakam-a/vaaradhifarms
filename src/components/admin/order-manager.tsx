@@ -341,15 +341,21 @@ export default function OrderManager() {
           <div className="p-6 md:p-8 flex flex-col gap-10 items-center overflow-y-auto max-h-[60vh] custom-scrollbar bg-zinc-900/50">
             <div className="space-y-2 w-full flex flex-col items-center">
                <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">1. Customer Receipt</p>
-               {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />}
+               <div className="bg-white rounded-sm overflow-hidden scale-90">
+                  {printingOrder && <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />}
+               </div>
             </div>
             <div className="space-y-2 w-full flex flex-col items-center">
                <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">2. Kitchen Ticket (KOT)</p>
-               {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
+               <div className="bg-white rounded-sm overflow-hidden scale-90">
+                  {printingOrder && <KOTComponent order={printingOrder} tableNumber={null} />}
+               </div>
             </div>
             <div className="space-y-2 w-full flex flex-col items-center">
               <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">3. Collection Token</p>
-              {printingOrder && <CollectionTokenComponent order={printingOrder} />}
+              <div className="bg-white rounded-sm overflow-hidden scale-90">
+                {printingOrder && <CollectionTokenComponent order={printingOrder} />}
+              </div>
             </div>
           </div>
 
@@ -364,10 +370,10 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* HIDDEN PRINT LAYER: Dedicated container for physical receipt output */}
+      {/* HIDDEN PRINT LAYER: Robust Block Structure for Browser Print Engines */}
       <div id="printable-receipt" className="print-layer">
         {printingOrder && (
-          <div className="flex flex-col bg-white">
+          <div className="bg-white w-[80mm] text-black">
             <div className="print-page-break">
               <ReceiptRouter order={printingOrder} settings={printSettings} tableNumber={null} />
             </div>

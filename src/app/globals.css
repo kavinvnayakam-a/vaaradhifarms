@@ -50,21 +50,25 @@
   }
 }
 
-/* Custom class to hide print elements on screen but keep them available for print media */
+/* Print Layer Logic - CRITICAL FOR THERMAL PRINTERS (MyPOS / Restsol) */
 .print-layer {
   display: none;
 }
 
 @media print {
+  /* Hide everything else on the screen */
   body * {
     visibility: hidden !important;
   }
 
-  .print-layer, .print-layer * {
+  /* Reveal only the print layer */
+  .print-layer, 
+  .print-layer * {
     visibility: visible !important;
     display: block !important;
   }
 
+  /* Absolute positioning to top-left of the paper roll */
   .print-layer {
     position: absolute !important;
     left: 0 !important;
@@ -76,7 +80,7 @@
     color: black !important;
   }
 
-  /* FORCED PAGE BREAKS FOR THERMAL PRINTERS (MyPOS / Restsol Compatibility) */
+  /* Force cuts between sections */
   .print-page-break {
     display: block !important;
     page-break-after: always !important;
@@ -84,9 +88,11 @@
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
+    width: 80mm !important;
+    clear: both !important;
   }
   
-  /* Reset page margins for physical output */
+  /* Reset page margins for physical thermal roll output */
   @page {
     margin: 0 !important;
     size: auto;
