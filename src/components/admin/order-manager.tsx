@@ -116,6 +116,7 @@ export default function OrderManager() {
       };
 
       const docRef = await addDoc(collection(firestore, "orders"), orderData);
+      // Construct a local object for immediate printing with timestamp shim
       setPrintingOrder({ id: docRef.id, ...orderData, timestamp: { seconds: Math.floor(Date.now() / 1000) } } as Order);
       setShowPrintPreview(true);
       setShowNewOrder(false);
@@ -127,13 +128,15 @@ export default function OrderManager() {
   };
 
   const executePrint = () => {
+    if (!printingOrder) return;
     setIsPrinting(true);
-    // Short delay to allow the "Printing" animation to start before the browser dialog blocks execution
+    // 1.5s delay to ensure the UI has finished the "Dispatching" animation 
+    // and the print layer is absolutely painted in the browser buffer.
     setTimeout(() => {
       window.print();
       setIsPrinting(false);
       setShowPrintPreview(false);
-    }, 1200);
+    }, 1500);
   };
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
@@ -413,7 +416,7 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* HIDDEN PRINT LAYER: Robust Block Structure for Browser Print Engines */}
+      {/* HIDDEN PRINT LAYER: Dedicated container for physical receipt output */}
       <div id="printable-receipt" className="print-layer">
         {printingOrder && (
           <div className="bg-white w-[80mm] text-black">

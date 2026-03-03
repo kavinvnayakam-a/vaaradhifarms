@@ -111,12 +111,14 @@ export default function TodayOrders() {
   }, [allTodaysOrders, searchTerm]);
 
   const executePrint = () => {
+    if (!printingOrder) return;
     setIsPrinting(true);
+    // 1.5s delay to ensure visual sync and buffer readiness
     setTimeout(() => {
       window.print();
       setIsPrinting(false);
       setShowPrintPreview(false);
-    }, 1200);
+    }, 1500);
   };
 
   return (
@@ -280,7 +282,7 @@ export default function TodayOrders() {
         </DialogContent>
       </Dialog>
 
-      {/* HIDDEN PRINT LAYER: Dedicated container for physical receipt output */}
+      {/* HIDDEN PRINT LAYER: Robust off-screen positioning ensures painting occurs before print dialog */}
       <div id="printable-receipt" className="print-layer">
         {printingOrder && (
           <div className="bg-white w-[80mm] text-black">
