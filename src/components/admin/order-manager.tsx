@@ -8,10 +8,10 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Plus, Store, ShoppingBag, Clock, User, ArrowRight, Search, X, Printer
+  Plus, Store, ShoppingBag, Clock, User, ArrowRight, Search, X, Printer, Loader2, CheckCircle2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +40,7 @@ export default function OrderManager() {
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -123,6 +124,16 @@ export default function OrderManager() {
     } catch (error) {
       toast({ variant: "destructive", title: "Order Failed" });
     }
+  };
+
+  const executePrint = () => {
+    setIsPrinting(true);
+    // Short delay to allow the "Printing" animation to start before the browser dialog blocks execution
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+      setShowPrintPreview(false);
+    }, 1200);
   };
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
@@ -328,7 +339,7 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
+      <Dialog open={showPrintPreview} onOpenChange={(o) => { if(!isPrinting) setShowPrintPreview(o); }}>
         <DialogContent className="max-w-[95vw] md:max-w-md rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl bg-zinc-950">
           <DialogHeader className="p-6 border-b border-white/5 flex justify-between items-center bg-black/40">
              <div>
@@ -337,12 +348,39 @@ export default function OrderManager() {
                 </DialogTitle>
                 <DialogDescription className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">Review Layout Sequence</DialogDescription>
              </div>
-             <button onClick={() => setShowPrintPreview(false)} className="p-2 text-white/20 hover:text-white transition-colors">
-                <X size={20} />
-             </button>
+             {!isPrinting && (
+               <button onClick={() => setShowPrintPreview(false)} className="p-2 text-white/20 hover:text-white transition-colors">
+                  <X size={20} />
+               </button>
+             )}
           </DialogHeader>
           
-          <div className="p-6 md:p-8 flex flex-col gap-10 items-center overflow-y-auto max-h-[60vh] custom-scrollbar bg-zinc-900/50">
+          <div className="p-6 md:p-8 flex flex-col gap-10 items-center overflow-y-auto max-h-[60vh] custom-scrollbar bg-zinc-900/50 relative">
+            {isPrinting && (
+              <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-in fade-in duration-500">
+                 <div className="relative w-24 h-24">
+                    <Loader2 className="w-full h-full text-background animate-spin opacity-20" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                       <CheckCircle2 className="text-background animate-pulse" size={40} />
+                    </div>
+                 </div>
+                 <div className="text-center space-y-2">
+                    <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Dispatching...</h4>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Hardware Handshake Active</p>
+                 </div>
+                 
+                 {/* Receipt Slide Animation */}
+                 <div className="w-20 h-32 bg-white rounded-t-lg overflow-hidden animate-receipt-out shadow-[0_0_30px_rgba(243,130,33,0.3)]">
+                    <div className="p-2 space-y-1">
+                       <div className="h-1 w-full bg-zinc-100 rounded-full" />
+                       <div className="h-1 w-3/4 bg-zinc-100 rounded-full" />
+                       <div className="h-4 w-full bg-background/10 rounded-sm mt-4" />
+                       <div className="h-1 w-1/2 bg-zinc-100 rounded-full mt-4" />
+                    </div>
+                 </div>
+              </div>
+            )}
+
             <div className="space-y-2 w-full flex flex-col items-center">
                <p className="text-white/30 text-[8px] font-black uppercase tracking-[0.3em]">1. Customer Receipt</p>
                <div className="bg-white rounded-sm overflow-hidden scale-90">
@@ -365,10 +403,11 @@ export default function OrderManager() {
 
           <div className="p-6 bg-black/40 border-t border-white/5">
             <button 
-              onClick={() => { window.print(); setShowPrintPreview(false); }} 
-              className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95"
+              onClick={executePrint}
+              disabled={isPrinting}
+              className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl hover:bg-zinc-900 transition-all active:scale-95 disabled:opacity-50"
             >
-              Execute Thermal Print
+              {isPrinting ? "Processing..." : "Execute Thermal Print"}
             </button>
           </div>
         </DialogContent>

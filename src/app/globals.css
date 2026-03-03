@@ -53,6 +53,9 @@
 /* Print Layer Logic - RE-ENGINEERED FOR THERMAL STABILITY */
 .print-layer {
   display: none;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
 }
 
 @media print {
@@ -69,9 +72,17 @@
   .print-layer, 
   .print-layer * {
     visibility: visible !important;
+    display: block !important;
     height: auto !important;
     overflow: visible !important;
   }
+
+  /* Restore layout-critical displays */
+  .print-layer table { display: table !important; }
+  .print-layer tr { display: table-row !important; }
+  .print-layer td, .print-layer th { display: table-cell !important; }
+  .print-layer .flex { display: flex !important; }
+  .print-layer .justify-between { justify-content: space-between !important; }
 
   /* Essential positioning for MyPOS / Restsol */
   .print-layer {
@@ -130,6 +141,15 @@
 @keyframes chop {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(10px); }
+}
+
+@keyframes receipt-out {
+  0% { transform: translateY(-100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-receipt-out {
+  animation: receipt-out 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .animate-float {
