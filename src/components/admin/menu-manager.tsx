@@ -261,7 +261,8 @@ export default function MenuManager() {
                     <textarea 
                       defaultValue={item.description}
                       onBlur={(e) => handleUpdateDescription(item.id, e.target.value)}
-                      className="w-full bg-transparent text-[10px] font-bold text-zinc-500 border-none focus:ring-0 resize-none h-12 custom-scrollbar outline-none italic"
+                      placeholder="Add description..."
+                      className="w-full bg-transparent text-[11px] font-bold text-zinc-800 border-none focus:ring-1 focus:ring-background/20 focus:bg-zinc-50/50 rounded-lg p-2 resize-none h-12 custom-scrollbar outline-none italic placeholder:text-zinc-300 transition-all"
                     />
                   </td>
 
