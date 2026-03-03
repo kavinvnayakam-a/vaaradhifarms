@@ -215,6 +215,10 @@ export default function OrderManager() {
 
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="max-w-[95vw] md:max-w-6xl rounded-[2rem] md:rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>New Order Creation</DialogTitle>
+            <DialogDescription>Select farm items and enter customer details to place an order manually.</DialogDescription>
+          </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-12 h-[85vh] md:h-[80vh] overflow-y-auto">
             <div className="md:col-span-7 bg-zinc-50 p-6 md:p-10 flex flex-col gap-6 md:gap-8 h-full">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

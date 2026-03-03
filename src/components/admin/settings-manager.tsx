@@ -113,13 +113,17 @@ export default function SettingsManager() {
       
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-[85vw] h-[85vh] rounded-[3.5rem] p-0 overflow-hidden bg-white border-none shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Hardware Configuration</DialogTitle>
+            <DialogDescription>Adjust store branding and thermal printer settings.</DialogDescription>
+          </DialogHeader>
           <div className="flex h-full flex-col md:flex-row">
             {/* Controls Side */}
             <div className="w-full md:w-[450px] p-10 bg-zinc-50 flex flex-col gap-8 border-r border-zinc-100 overflow-y-auto custom-scrollbar">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 flex items-center gap-3">
+                <h3 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 flex items-center gap-3">
                   <Settings className="text-background" /> Config
-                </DialogTitle>
+                </h3>
                 <button onClick={() => setShowSettings(false)} className="p-2 text-zinc-300 hover:text-rose-500 transition-colors">
                   <X size={24} />
                 </button>

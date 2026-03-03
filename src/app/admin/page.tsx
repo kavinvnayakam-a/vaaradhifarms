@@ -42,6 +42,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -246,6 +247,7 @@ export default function AdminDashboard() {
                 <SheetContent side="bottom" className="rounded-t-[3rem] border-none bg-zinc-50 p-8 pb-12">
                   <SheetHeader className="mb-8">
                     <SheetTitle className="text-2xl font-black italic uppercase tracking-tighter">Boutique Tools</SheetTitle>
+                    <SheetDescription className="sr-only">Access advanced business analytics and store configuration settings.</SheetDescription>
                   </SheetHeader>
                   <div className="grid grid-cols-2 gap-4">
                     {secondaryNav.map((item) => (
