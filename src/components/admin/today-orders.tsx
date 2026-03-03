@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -40,7 +41,21 @@ export default function TodayOrders() {
   const firestore = useFirestore();
   const { toast } = useToast();
   
-  const todayDate = new Date().toISOString().split('T')[0];
+  // Shift starts at 1:00 AM
+  const getShiftStart = () => {
+    const d = new Date();
+    d.setHours(1, 0, 0, 0);
+    if (new Date().getHours() < 1) {
+      d.setDate(d.getDate() - 1);
+    }
+    return d;
+  };
+
+  const getShiftEnd = () => {
+    const d = getShiftStart();
+    d.setDate(d.getDate() + 1);
+    return d;
+  };
 
   useEffect(() => {
     if (!firestore) return;
@@ -49,15 +64,13 @@ export default function TodayOrders() {
       if (d.exists()) setPrintSettings({ ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings);
     });
 
-    const start = new Date(todayDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(todayDate);
-    end.setHours(23, 59, 59, 999);
+    const shiftStart = getShiftStart();
+    const shiftEnd = getShiftEnd();
 
     const qLive = query(
       collection(firestore, "orders"), 
-      where("timestamp", ">=", Timestamp.fromDate(start)),
-      where("timestamp", "<=", Timestamp.fromDate(end))
+      where("timestamp", ">=", Timestamp.fromDate(shiftStart)),
+      where("timestamp", "<=", Timestamp.fromDate(shiftEnd))
     );
 
     const unsubLive = onSnapshot(qLive, (snapshot) => {
@@ -69,8 +82,8 @@ export default function TodayOrders() {
       try {
         const qHist = query(
           collection(firestore, "order_history"),
-          where("timestamp", ">=", Timestamp.fromDate(start)),
-          where("timestamp", "<=", Timestamp.fromDate(end))
+          where("timestamp", ">=", Timestamp.fromDate(shiftStart)),
+          where("timestamp", "<=", Timestamp.fromDate(shiftEnd))
         );
         const snapshot = await getDocs(qHist);
         setHistoryOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
@@ -83,7 +96,7 @@ export default function TodayOrders() {
     
     fetchHistory();
     return () => { unsubLive(); unsubSettings(); };
-  }, [firestore, todayDate, toast, loading]);
+  }, [firestore, toast, loading]);
 
   const allTodaysOrders = useMemo(() => {
     const combined = [...liveOrders, ...historyOrders];
@@ -107,7 +120,9 @@ export default function TodayOrders() {
            </div>
            <div>
             <h2 className="text-3xl font-black italic uppercase tracking-tighter text-zinc-900">Today's Registry</h2>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Activity Log: {new Date(todayDate).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
+              Active Shift: {getShiftStart().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} to {getShiftEnd().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+            </p>
           </div>
         </div>
         <div className="relative flex-1 md:flex-none w-full md:w-auto">
@@ -178,7 +193,7 @@ export default function TodayOrders() {
         ) : (
           <div className="col-span-full h-64 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-100 rounded-[4rem] text-zinc-200">
              <ShoppingBag size={48} className="mb-4" />
-             <p className="text-[10px] font-black uppercase tracking-[0.4em]">No activity recorded today</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.4em]">No activity recorded in this shift</p>
           </div>
         )}
       </div>

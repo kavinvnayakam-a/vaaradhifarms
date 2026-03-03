@@ -9,7 +9,6 @@ import {
     Banknote, 
     TrendingUp, 
     Calendar,
-    Users,
     ArrowUpRight,
     ShoppingBag,
     Search,
@@ -23,7 +22,6 @@ import {
   } from 'lucide-react';
 import { formatCurrency, cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PrintSettings {
   storeName: string;
@@ -47,15 +45,18 @@ export default function AnalyticsDashboard() {
     if (!firestore) return;
     setLoading(true);
     
-    const start = new Date(selectedDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(selectedDate);
-    end.setHours(23, 59, 59, 999);
+    // Business shift logic: 1:00 AM to 1:00 AM
+    const shiftStart = new Date(selectedDate);
+    shiftStart.setHours(1, 0, 0, 0);
+    
+    const shiftEnd = new Date(selectedDate);
+    shiftEnd.setDate(shiftEnd.getDate() + 1);
+    shiftEnd.setHours(1, 0, 0, 0);
 
     const qLive = query(
       collection(firestore, "orders"), 
-      where("timestamp", ">=", Timestamp.fromDate(start)),
-      where("timestamp", "<=", Timestamp.fromDate(end))
+      where("timestamp", ">=", Timestamp.fromDate(shiftStart)),
+      where("timestamp", "<", Timestamp.fromDate(shiftEnd))
     );
 
     const unsubLive = onSnapshot(qLive, (snapshot) => {
@@ -71,8 +72,8 @@ export default function AnalyticsDashboard() {
       try {
         const qHist = query(
           collection(firestore, "order_history"),
-          where("timestamp", ">=", Timestamp.fromDate(start)),
-          where("timestamp", "<=", Timestamp.fromDate(end)),
+          where("timestamp", ">=", Timestamp.fromDate(shiftStart)),
+          where("timestamp", "<", Timestamp.fromDate(shiftEnd)),
           orderBy("timestamp", "desc")
         );
         const snapshot = await getDocs(qHist);
@@ -128,7 +129,7 @@ export default function AnalyticsDashboard() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
         <div className="flex flex-col">
           <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">Business Analytics</h3>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Financial & Tax Performance</p>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Shift Logic: 1:00 AM Start</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -155,17 +156,17 @@ export default function AnalyticsDashboard() {
             onClick={handlePrintReport}
             className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
           >
-            <Printer size={16} /> Print EOD Report
+            <Printer size={16} /> Print Shift Report
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
-          title="Grand Total (Sales)" 
+          title="Shift Sales" 
           value={formatCurrency(stats.revenue.total)} 
           icon={<Banknote size={24} />} 
-          trend="Incl. all taxes"
+          trend="Current Cycle"
           color="text-primary"
           bgColor="bg-primary/10"
         />
@@ -173,15 +174,15 @@ export default function AnalyticsDashboard() {
           title="Net Revenue" 
           value={formatCurrency(stats.revenue.subtotal)} 
           icon={<TrendingUp size={24} />} 
-          trend="Excl. GST Charges"
+          trend="Excl. GST"
           color="text-emerald-600"
           bgColor="bg-emerald-50"
         />
         <StatCard 
-          title="GST Collections" 
+          title="GST Collected" 
           value={formatCurrency(stats.revenue.gst)} 
           icon={<Receipt size={24} />} 
-          trend="Payable Liability"
+          trend="Liability"
           color="text-blue-600"
           bgColor="bg-blue-50"
         />
@@ -189,26 +190,26 @@ export default function AnalyticsDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
-          title="UPI Collections" 
+          title="UPI" 
           value={formatCurrency(stats.payments.UPI || 0)} 
           icon={<Smartphone size={24} />} 
-          trend={`${stats.payments.count_UPI || 0} Transactions`}
+          trend={`${stats.payments.count_UPI || 0} Txns`}
           color="text-purple-600"
           bgColor="bg-purple-50"
         />
         <StatCard 
-          title="Cash Collections" 
+          title="Cash" 
           value={formatCurrency(stats.payments.Cash || 0)} 
           icon={<Wallet size={24} />} 
-          trend={`${stats.payments.count_Cash || 0} Transactions`}
+          trend={`${stats.payments.count_Cash || 0} Txns`}
           color="text-amber-600"
           bgColor="bg-amber-50"
         />
         <StatCard 
-          title="Card Collections" 
+          title="Card" 
           value={formatCurrency(stats.payments.Card || 0)} 
           icon={<CreditCard size={24} />} 
-          trend={`${stats.payments.count_Card || 0} Transactions`}
+          trend={`${stats.payments.count_Card || 0} Txns`}
           color="text-zinc-900"
           bgColor="bg-zinc-100"
         />
@@ -218,7 +219,7 @@ export default function AnalyticsDashboard() {
         <div className="p-10 border-b border-zinc-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h3 className="text-xl font-black uppercase italic tracking-tighter text-zinc-900">Transaction Registry</h3>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Detailed log for {new Date(selectedDate).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Operational Shift for {new Date(selectedDate).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
           </div>
           <div className="flex items-center gap-4">
              <div className="px-5 py-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[10px] font-black uppercase flex items-center gap-2">
@@ -277,7 +278,7 @@ export default function AnalyticsDashboard() {
                       <ShoppingBag size={48} className="text-zinc-100" />
                       <div>
                         <p className="text-sm font-black uppercase italic text-zinc-300">No transactions recorded</p>
-                        <p className="text-[9px] font-bold text-zinc-200 uppercase tracking-widest mt-1">Try another date or search query</p>
+                        <p className="text-[9px] font-bold text-zinc-200 uppercase tracking-widest mt-1">Shift cleanup active at 1:00 AM</p>
                       </div>
                     </div>
                   </td>
@@ -293,9 +294,9 @@ export default function AnalyticsDashboard() {
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-primary" /> EOD Report Preview
+                   <ReceiptText className="text-primary" /> Shift Report Preview
                 </DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Daily Summary Before Printing</DialogDescription>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Shift Cycle: 1:00 AM to 1:00 AM</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
                 <X size={20} />
@@ -305,9 +306,9 @@ export default function AnalyticsDashboard() {
           <div className='p-10 bg-zinc-950 flex flex-col items-center'>
             <div id="eod-report-preview-content" className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] w-[300px] font-black">
               <div className="text-center border-b border-dashed border-black pb-4 mb-4">
-                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Dindigul Ananda\'s Briyani'}</h1>
+                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Vaaradhi Farms'}</h1>
                 <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
-                <p className="text-base font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
+                <p className="text-base font-black mt-4 border-y border-black py-2">SHIFT SALES SUMMARY</p>
                 <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
 
@@ -354,7 +355,7 @@ export default function AnalyticsDashboard() {
 
           <DialogFooter className="p-8 bg-zinc-900 flex flex-col gap-4">
              <button onClick={executePrint} className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
-                <Printer size={18} /> Execute RTP-81 Print
+                <Printer size={18} /> Execute Shift Print
              </button>
           </DialogFooter>
         </DialogContent>
@@ -363,10 +364,10 @@ export default function AnalyticsDashboard() {
       <div id="printable-eod-report" className="hidden">
           <div className="font-mono text-black p-0 m-0 w-[80mm] text-xs">
             <div className="text-center border-b border-dashed border-black pb-2 mb-2">
-              <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Dindigul Ananda's Briyani"}</h1>
+              <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Vaaradhi Farms"}</h1>
               <p className="uppercase text-[9px] font-bold mb-1">{printSettings?.address}</p>
               <div className="text-sm font-black border-y border-black py-1 my-1 uppercase">
-                End of Day Report
+                Shift Report Summary
               </div>
               <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
             </div>
@@ -407,8 +408,8 @@ export default function AnalyticsDashboard() {
             </div>
 
             <div className="text-center pt-2 border-t border-dashed border-black">
-              <p className="italic text-[9px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
-              <p className="text-[8px] mt-1 font-black uppercase tracking-widest">Dindigul Ananda's System</p>
+              <p className="italic text-[9px] uppercase font-bold">Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+              <p className="text-[8px] mt-1 font-black uppercase tracking-widest">Vaaradhi Farms POS</p>
             </div>
         </div>
       </div>

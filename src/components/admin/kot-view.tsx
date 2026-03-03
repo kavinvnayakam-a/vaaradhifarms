@@ -7,7 +7,7 @@ import {
   collection, onSnapshot, query, orderBy, doc, 
   updateDoc, writeBatch, serverTimestamp, getDoc
 } from 'firebase/firestore';
-import { Order, Table as TableType } from '@/lib/types';
+import { Order } from '@/lib/types';
 import { 
   CheckCircle2, Clock, ChefHat, Hash, Box, PackageCheck, Handshake, History, Flame
 } from 'lucide-react';
@@ -31,6 +31,7 @@ export default function KotView() {
     return () => unsubOrders();
   }, [firestore]);
 
+  // DAILY CLEANUP LOGIC: Clear workspace at 1:00 AM
   useEffect(() => {
     if (!firestore || orders.length === 0 || isCleaning) return;
 
@@ -39,8 +40,13 @@ export default function KotView() {
       try {
         const now = new Date();
         const cutoff = new Date();
-        cutoff.setHours(23, 0, 0, 0); 
-        if (now < cutoff) cutoff.setDate(cutoff.getDate() - 1);
+        cutoff.setHours(1, 0, 0, 0); // Cutoff is 1:00 AM
+        
+        // If it's currently past midnight but before 1 AM, 
+        // we are clearing orders from the calendar day before yesterday
+        if (now.getHours() < 1) {
+          cutoff.setDate(cutoff.getDate() - 1);
+        }
 
         const expiredOrders = orders.filter(order => {
           const orderDate = order.timestamp?.seconds 
@@ -54,11 +60,17 @@ export default function KotView() {
           expiredOrders.forEach(order => {
             const historyRef = doc(collection(firestore, "order_history"));
             const orderRef = doc(firestore, "orders", order.id);
-            batch.set(historyRef, { ...order, status: "Completed", archivedAt: serverTimestamp() });
+            // Archive if not already archived, or just delete if it's junk
+            batch.set(historyRef, { 
+              ...order, 
+              status: order.status === 'Handover' ? "Completed" : order.status, 
+              archivedAt: serverTimestamp(),
+              cleanupEvent: "1AM_AUTO_CLEAR"
+            });
             batch.delete(orderRef);
           });
           await batch.commit();
-          toast({ title: "Daily Archive Complete" });
+          toast({ title: "Kitchen Workspace Cleaned", description: `${expiredOrders.length} stale orders archived.` });
         }
       } catch (err) {
         console.error("Auto-archive failure:", err);
@@ -66,6 +78,7 @@ export default function KotView() {
         setIsCleaning(false);
       }
     };
+    
     performAutoArchive();
   }, [firestore, orders, isCleaning, toast]);
 
@@ -187,7 +200,6 @@ export default function KotView() {
 }
 
 function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover }: any) {
-  const identifier = order.tableId === 'Takeaway' ? 'Collection' : `Dine-In`;
   const subIdentifier = order.customerName;
 
   return (
@@ -203,7 +215,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
               <Hash size={18} />
            </div>
            <div>
-              <span className="text-2xl font-black italic text-zinc-900 leading-none">{order.orderNumber}</span>
+              <span className="text-2xl font-black italic text-zinc-900 leading-none">#{order.orderNumber}</span>
               <div className="flex items-center gap-2 text-zinc-400 text-[9px] font-bold uppercase tracking-widest mt-1">
                  <Clock size={10}/> {formatTime(order.timestamp)}
               </div>
