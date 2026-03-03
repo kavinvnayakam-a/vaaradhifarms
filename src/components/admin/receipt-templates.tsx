@@ -179,24 +179,19 @@ export const KOTComponent = ({ order }: { order: Order, tableNumber: string | nu
 );
 
 export const CollectionTokenComponent = ({ order }: { order: Order }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center shadow-2xl border-2 border-zinc-100">
+    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center shadow-2xl border-2 border-zinc-100 h-full flex flex-col justify-center">
         <p className="text-lg font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2">
             Collection Token
         </p>
-        <p className="text-[10px] font-bold mt-4 uppercase text-zinc-400">Wait For Your Token</p>
-        <h1 className="text-9xl font-black italic leading-none my-4">#{order.orderNumber}</h1>
-        <div className="border-t-2 border-dashed border-black pt-3 mt-3 text-left">
-            <p className="text-center font-bold uppercase text-[9px] mb-2 text-zinc-500">{order.tableId === 'Takeaway' ? 'Takeaway' : 'Dine-In'} Selection</p>
-            <div className="space-y-1">
-                {order.items.map((item, idx) => (
-                    <p key={idx} className="text-[10px] font-black uppercase">
-                        - {item.quantity}x {item.name}
-                    </p>
-                ))}
-            </div>
+        <p className="text-[10px] font-bold mt-6 uppercase text-zinc-400">Order Number</p>
+        <h1 className="text-[12rem] font-black italic leading-none my-2 -tracking-[0.05em]">#{order.orderNumber}</h1>
+        <div className="border-t-2 border-dashed border-black pt-4 mt-4">
+            <p className="text-center font-black uppercase text-xl text-black">
+                {order.tableId === 'Takeaway' ? 'TAKEAWAY' : 'DINE-IN'}
+            </p>
         </div>
-        <div className="border-t-2 border-dashed border-black mt-4 pt-3">
-            <p className="text-center text-[10px] font-bold uppercase">Please present this at counter.</p>
+        <div className="border-t-2 border-dashed border-black mt-6 pt-4">
+            <p className="text-center text-[10px] font-bold uppercase">Please present this at the counter.</p>
             <p className="text-center text-[8px] font-bold mt-2 opacity-30">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
         </div>
     </div>
