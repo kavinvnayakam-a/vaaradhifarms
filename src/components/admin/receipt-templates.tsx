@@ -35,7 +35,7 @@ interface ReceiptProps {
 }
 
 const Template1 = ({ order, settings }: ReceiptProps) => (
-    <div className="bg-white text-black p-2 font-mono text-[11px] w-[80mm] leading-tight">
+    <div className="bg-white text-black p-2 font-mono text-[11px] w-[80mm] leading-tight" style={{ width: '80mm' }}>
       <div className="text-center mb-2">
           <h2 className="text-lg font-black uppercase">{settings.storeName}</h2>
           <p className="text-[9px] uppercase font-bold leading-tight">{settings.address}</p>
@@ -95,7 +95,7 @@ const Template1 = ({ order, settings }: ReceiptProps) => (
 );
 
 const Template2 = ({ order, settings }: ReceiptProps) => (
-    <div className="bg-white text-black p-4 font-sans w-[80mm] text-[12px] leading-tight">
+    <div className="bg-white text-black p-4 font-sans w-[80mm] text-[12px] leading-tight" style={{ width: '80mm' }}>
         <div className="text-center mb-4">
             <h2 className="text-2xl font-extrabold tracking-tight uppercase leading-none mb-1">{settings.storeName}</h2>
             <p className="text-[9px] text-gray-500 uppercase tracking-widest">{settings.address}</p>
@@ -126,7 +126,7 @@ const Template2 = ({ order, settings }: ReceiptProps) => (
 );
 
 const TemplateStub = ({ order, settings, id }: ReceiptProps & { id: number }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm] border-4 border-double border-black leading-tight">
+    <div className="bg-white text-black p-4 font-mono w-[80mm] border-4 border-double border-black leading-tight" style={{ width: '80mm' }}>
         <h3 className="text-center font-black uppercase text-lg border-b-2 border-black pb-2 mb-4">Template {id}</h3>
         <div className="text-center mb-4">
             <p className="text-sm font-bold">{settings.storeName}</p>
@@ -161,7 +161,7 @@ export const ReceiptRouter = (props: ReceiptProps) => {
 };
 
 export const KOTComponent = ({ order }: { order: Order, tableNumber: string | null }) => (
-    <div className="bg-white text-black p-2 font-mono w-[80mm] leading-tight text-center">
+    <div className="bg-white text-black p-2 font-mono w-[80mm] leading-tight text-center" style={{ width: '80mm' }}>
         <div className="border-b-2 border-dashed border-black pb-2 mb-2">
             <p className="text-2xl font-black uppercase tracking-widest">K.O.T</p>
             <h1 className="text-6xl font-black italic leading-none my-2">#{order?.orderNumber}</h1>
@@ -183,7 +183,7 @@ export const KOTComponent = ({ order }: { order: Order, tableNumber: string | nu
 );
 
 export const CollectionTokenComponent = ({ order }: { order: Order }) => (
-    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center flex flex-col justify-center items-center min-h-[150px] border-2 border-black">
+    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center flex flex-col justify-center items-center min-h-[150px] border-2 border-black" style={{ width: '80mm' }}>
         <p className="text-xl font-black uppercase tracking-widest border-b-2 border-dashed border-black pb-2 mb-4 w-full">
             COLLECTION TOKEN
         </p>

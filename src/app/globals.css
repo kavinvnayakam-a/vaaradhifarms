@@ -50,66 +50,73 @@
   }
 }
 
-/* Print Layer Logic - RE-ENGINEERED TO PREVENT BLANK PAGES */
-/* We keep it in the layout tree but off-screen so the browser can "paint" it */
+/* HIGH-RELIABILITY PRINT LAYER ARCHITECTURE */
+/* On screen: Hidden but in render tree */
 .print-layer {
-  position: fixed;
-  top: -10000px;
-  left: -10000px;
+  position: absolute;
+  left: -9999px;
+  top: 0;
   width: 80mm;
-  z-index: -9999;
-  pointer-events: none;
+  height: 0;
+  overflow: hidden;
 }
 
 @media print {
-  /* Reset browser UI */
   @page {
     margin: 0 !important;
-    size: auto;
+    size: 80mm auto !important;
   }
 
-  /* Hide everything on the screen */
-  body * {
-    visibility: hidden !important;
-    height: 0 !important;
+  /* Reset global styles for printing */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
-    display: none !important;
   }
 
-  /* Reveal and format the print layer only */
+  /* Hide EVERYTHING by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Reveal ONLY the print layer and its children */
   .print-layer, 
   .print-layer * {
     visibility: visible !important;
     display: block !important;
-    height: auto !important;
-    overflow: visible !important;
-    position: static !important;
-    width: 80mm !important;
     background: white !important;
     color: black !important;
-    opacity: 1 !important;
   }
 
-  /* Preserve layout-critical displays for receipts */
+  /* Restore specific layouts within the print layer */
+  .print-layer {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80mm !important;
+    height: auto !important;
+    overflow: visible !important;
+    z-index: 99999 !important;
+  }
+
+  /* Preserve flex and table alignments for receipts */
   .print-layer .flex { display: flex !important; }
   .print-layer .justify-between { justify-content: space-between !important; }
-  .print-layer table { display: table !important; width: 100% !important; }
+  .print-layer table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
   .print-layer tr { display: table-row !important; }
   .print-layer td, .print-layer th { display: table-cell !important; }
 
-  /* Forced Hardware Page Cuts */
+  /* Precise Hardware Cuts */
   .print-page-break {
     display: block !important;
     page-break-after: always !important;
     break-after: page !important;
     width: 80mm !important;
-    height: 0 !important;
-    border: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    clear: both !important;
+    border-bottom: 1px dashed #ccc; /* Tiny visual aid for manual tear-off if cutter fails */
   }
 }
 
