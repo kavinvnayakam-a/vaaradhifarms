@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -129,7 +128,7 @@ export default function AnalyticsDashboard() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
         <div className="flex flex-col">
           <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">Business Analytics</h3>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Shift Logic: 1:00 AM Start</p>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Shift Cycle: 1:00 AM Start</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -140,35 +139,35 @@ export default function AnalyticsDashboard() {
               placeholder="Search Transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-primary transition-all w-full md:w-64 text-black"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-[10px] font-bold uppercase outline-none focus:border-background transition-all w-full md:w-64 text-zinc-900"
             />
           </div>
           <div className="relative flex-1 md:flex-none">
-            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={16} />
+            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-background" size={16} />
             <input 
               type="date" 
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-primary transition-all w-full md:w-auto text-black"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-[10px] font-bold uppercase outline-none focus:border-background transition-all w-full md:w-auto text-zinc-900"
             />
           </div>
           <button 
             onClick={handlePrintReport}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
+            className="flex items-center gap-2 bg-background text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
           >
-            <Printer size={16} /> Print Shift Report
+            <Printer size={16} /> Print EOD Report
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
-          title="Shift Sales" 
+          title="Daily Sales" 
           value={formatCurrency(stats.revenue.total)} 
           icon={<Banknote size={24} />} 
           trend="Current Cycle"
-          color="text-primary"
-          bgColor="bg-primary/10"
+          color="text-background"
+          bgColor="bg-background/10"
         />
         <StatCard 
           title="Net Revenue" 
@@ -190,7 +189,7 @@ export default function AnalyticsDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
-          title="UPI" 
+          title="UPI Payments" 
           value={formatCurrency(stats.payments.UPI || 0)} 
           icon={<Smartphone size={24} />} 
           trend={`${stats.payments.count_UPI || 0} Txns`}
@@ -198,7 +197,7 @@ export default function AnalyticsDashboard() {
           bgColor="bg-purple-50"
         />
         <StatCard 
-          title="Cash" 
+          title="Cash Sales" 
           value={formatCurrency(stats.payments.Cash || 0)} 
           icon={<Wallet size={24} />} 
           trend={`${stats.payments.count_Cash || 0} Txns`}
@@ -206,7 +205,7 @@ export default function AnalyticsDashboard() {
           bgColor="bg-amber-50"
         />
         <StatCard 
-          title="Card" 
+          title="Card Sales" 
           value={formatCurrency(stats.payments.Card || 0)} 
           icon={<CreditCard size={24} />} 
           trend={`${stats.payments.count_Card || 0} Txns`}
@@ -264,7 +263,7 @@ export default function AnalyticsDashboard() {
                       <span className="text-xs font-bold text-zinc-400 tracking-tight">{formatCurrency(subTotal)}</span>
                     </td>
                     <td className="px-10 py-8 text-right">
-                      <span className="text-xs font-bold text-primary tracking-tight">{formatCurrency(taxTotal)}</span>
+                      <span className="text-xs font-bold text-background tracking-tight">{formatCurrency(taxTotal)}</span>
                     </td>
                     <td className="px-10 py-8 text-right">
                       <span className="text-lg font-black italic text-zinc-900">{formatCurrency(order.totalPrice)}</span>
@@ -294,7 +293,7 @@ export default function AnalyticsDashboard() {
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-primary" /> Shift Report Preview
+                   <ReceiptText className="text-background" /> EOD Report Preview
                 </DialogTitle>
                 <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Shift Cycle: 1:00 AM to 1:00 AM</DialogDescription>
              </div>
@@ -308,7 +307,7 @@ export default function AnalyticsDashboard() {
               <div className="text-center border-b border-dashed border-black pb-4 mb-4">
                 <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Vaaradhi Farms'}</h1>
                 <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
-                <p className="text-base font-black mt-4 border-y border-black py-2">SHIFT SALES SUMMARY</p>
+                <p className="text-base font-black mt-4 border-y border-black py-2">EOD SALES SUMMARY</p>
                 <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
 
@@ -332,7 +331,7 @@ export default function AnalyticsDashboard() {
               </div>
 
               <div className="space-y-3 mb-6">
-                <p className="font-black text-center mb-3 border-b border-black text-sm">PAYMENT BREAKDOWN</p>
+                <p className="font-black text-center mb-3 border-b border-black text-sm uppercase">Payment Split</p>
                 <div className="flex justify-between">
                   <span>UPI ({stats.payments.count_UPI || 0})</span>
                   <span>{formatCurrency(stats.payments.UPI || 0)}</span>
@@ -354,8 +353,8 @@ export default function AnalyticsDashboard() {
           </div>
 
           <DialogFooter className="p-8 bg-zinc-900 flex flex-col gap-4">
-             <button onClick={executePrint} className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
-                <Printer size={18} /> Execute Shift Print
+             <button onClick={executePrint} className="w-full py-5 bg-background text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
+                <Printer size={18} /> Execute EOD Print
              </button>
           </DialogFooter>
         </DialogContent>
@@ -367,7 +366,7 @@ export default function AnalyticsDashboard() {
               <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Vaaradhi Farms"}</h1>
               <p className="uppercase text-[9px] font-bold mb-1">{printSettings?.address}</p>
               <div className="text-sm font-black border-y border-black py-1 my-1 uppercase">
-                Shift Report Summary
+                EOD Report Summary
               </div>
               <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
             </div>
